@@ -1,8 +1,8 @@
 package query
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/internal/query"
-	"github.com/andrei-cosmin/hakkt-ecs/internal/state"
+	"github.com/andrei-cosmin/hakkt/internal/query"
+	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/hashicorp/go-set"
 )
 

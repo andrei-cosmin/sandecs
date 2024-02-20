@@ -1,9 +1,9 @@
 package query
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/internal/component"
-	"github.com/andrei-cosmin/hakkt-ecs/internal/entity"
-	"github.com/andrei-cosmin/hakkt-ecs/internal/sparse"
+	"github.com/andrei-cosmin/hakkt/internal/component"
+	"github.com/andrei-cosmin/hakkt/internal/entity"
+	"github.com/andrei-cosmin/hakkt/internal/sparse"
 	"github.com/bits-and-blooms/bitset"
 )
 

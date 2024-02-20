@@ -1,8 +1,8 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/component"
-	internalComponent "github.com/andrei-cosmin/hakkt-ecs/internal/component"
+	"github.com/andrei-cosmin/hakkt/component"
+	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
 	"unsafe"
 )
 

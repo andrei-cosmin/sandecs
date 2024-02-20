@@ -1,12 +1,12 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/component"
-	internalComponent "github.com/andrei-cosmin/hakkt-ecs/internal/component"
-	internalEntity "github.com/andrei-cosmin/hakkt-ecs/internal/entity"
-	internalQuery "github.com/andrei-cosmin/hakkt-ecs/internal/query"
-	"github.com/andrei-cosmin/hakkt-ecs/marker"
-	"github.com/andrei-cosmin/hakkt-ecs/query"
+	"github.com/andrei-cosmin/hakkt/component"
+	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
+	internalEntity "github.com/andrei-cosmin/hakkt/internal/entity"
+	internalQuery "github.com/andrei-cosmin/hakkt/internal/query"
+	"github.com/andrei-cosmin/hakkt/marker"
+	"github.com/andrei-cosmin/hakkt/query"
 )
 
 type Sandbox struct {
