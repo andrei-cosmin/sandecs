@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/internal/state"
+	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/bits-and-blooms/bitset"
 	"github.com/gammazero/deque"
 )

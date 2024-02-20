@@ -1,8 +1,8 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt-ecs/marker"
-	"github.com/andrei-cosmin/hakkt-ecs/query"
+	"github.com/andrei-cosmin/hakkt/marker"
+	"github.com/andrei-cosmin/hakkt/query"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
