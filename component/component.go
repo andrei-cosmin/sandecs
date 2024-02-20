@@ -1,5 +1,7 @@
 package component
 
+type Id = uint
+
 type Component interface{}
 
 type Linker[T Component] interface {

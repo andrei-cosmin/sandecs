@@ -1,21 +1,22 @@
 package component
 
 import (
+	"github.com/andrei-cosmin/hakkt/component"
 	"github.com/andrei-cosmin/hakkt/internal/sparse"
 	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/bits-and-blooms/bitset"
 )
 
 type LinkManager struct {
-	linkedComponents  map[string]uint
+	linkedComponents  map[string]component.Id
 	Linkers           *sparse.Array[*Linker]
-	componentIdCursor uint
+	componentIdCursor component.Id
 	state.State
 }
 
 func NewLinkManager(size uint) *LinkManager {
 	return &LinkManager{
-		linkedComponents:  make(map[string]uint),
+		linkedComponents:  make(map[string]component.Id),
 		Linkers:           sparse.New[*Linker](size),
 		componentIdCursor: 0,
 		State:             state.New(),
@@ -23,7 +24,7 @@ func NewLinkManager(size uint) *LinkManager {
 }
 
 func (l *LinkManager) Link(componentType string) *Linker {
-	var componentId uint
+	var componentId component.Id
 
 	if id, ok := l.linkedComponents[componentType]; ok {
 		componentId = id
@@ -40,7 +41,7 @@ func (l *LinkManager) Link(componentType string) *Linker {
 	return l.Linkers.Get(componentId)
 }
 
-func (l *LinkManager) Find(componentId uint) *Linker {
+func (l *LinkManager) Find(componentId component.Id) *Linker {
 	return l.Linkers.Get(componentId)
 }
 

@@ -1,25 +1,29 @@
 package query
 
 import (
+	"github.com/andrei-cosmin/hakkt/component"
+	"github.com/andrei-cosmin/hakkt/entity"
 	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/bits-and-blooms/bitset"
 )
 
+type CacheId = uint
+
 type Cache struct {
-	id                   uint
-	matchedComponentIds  []uint
-	excludedComponentIds []uint
-	oneOfComponentIds    []uint
+	cacheId              CacheId
+	matchedComponentIds  []component.Id
+	excludedComponentIds []component.Id
+	oneOfComponentIds    []component.Id
 	linkMarker           *bitset.BitSet
 	removeMarker         *bitset.BitSet
 	linkedEntities       *bitset.BitSet
-	entityCache          []uint
+	entityIdsCache       []entity.Id
 	state.State
 }
 
-func newCache(size uint, id uint, matchedIds []uint, excludedIds []uint, oneOfIds []uint) *Cache {
+func newCache(size uint, cacheId CacheId, matchedIds []component.Id, excludedIds []component.Id, oneOfIds []component.Id) *Cache {
 	return &Cache{
-		id:                   id,
+		cacheId:              cacheId,
 		matchedComponentIds:  matchedIds,
 		excludedComponentIds: excludedIds,
 		oneOfComponentIds:    oneOfIds,
@@ -30,18 +34,17 @@ func newCache(size uint, id uint, matchedIds []uint, excludedIds []uint, oneOfId
 	}
 }
 
-func (c *Cache) GetEntities() []uint {
+func (c *Cache) GetEntities() []entity.Id {
 	if !c.IsUpdated() {
 		c.Reset()
-		c.entityCache = c.entityCache[:0]
+		c.entityIdsCache = c.entityIdsCache[:0]
 
-		index := uint(0)
-		for index, hasNext := c.linkedEntities.NextSet(index); hasNext; index, hasNext = c.linkedEntities.NextSet(index + 1) {
-			c.entityCache = append(c.entityCache, index)
+		for entityId, hasNext := c.linkedEntities.NextSet(0); hasNext; entityId, hasNext = c.linkedEntities.NextSet(entityId + 1) {
+			c.entityIdsCache = append(c.entityIdsCache, entityId)
 		}
 	}
 
-	return c.entityCache
+	return c.entityIdsCache
 }
 
 func (c *Cache) linkAll(entities *bitset.BitSet) {

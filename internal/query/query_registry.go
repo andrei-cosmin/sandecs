@@ -1,7 +1,8 @@
 package query
 
 import (
-	"github.com/andrei-cosmin/hakkt/internal/component"
+	"github.com/andrei-cosmin/hakkt/component"
+	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
 	"github.com/andrei-cosmin/hakkt/internal/entity"
 	"github.com/andrei-cosmin/hakkt/internal/sparse"
 	"github.com/bits-and-blooms/bitset"
@@ -9,18 +10,18 @@ import (
 
 type Registry struct {
 	entityLinker         *entity.Linker
-	componentLinker      *component.LinkManager
-	registry             map[string]uint
+	componentLinker      *internalComponent.LinkManager
+	registry             map[string]CacheId
 	caches               *sparse.Array[*Cache]
 	linkedEntitiesBuffer *bitset.BitSet
 	defaultCacheSize     uint
 }
 
-func NewRegistry(size uint, entityLinker *entity.Linker, componentLinker *component.LinkManager) *Registry {
+func NewRegistry(size uint, entityLinker *entity.Linker, componentLinker *internalComponent.LinkManager) *Registry {
 	return &Registry{
 		entityLinker:         entityLinker,
 		componentLinker:      componentLinker,
-		registry:             make(map[string]uint),
+		registry:             make(map[string]CacheId),
 		caches:               sparse.New[*Cache](size),
 		linkedEntitiesBuffer: bitset.New(size),
 		defaultCacheSize:     size,
@@ -28,16 +29,16 @@ func NewRegistry(size uint, entityLinker *entity.Linker, componentLinker *compon
 }
 
 func (r *Registry) Resolve(query *Info) *Cache {
-	var queryId uint
+	var cacheId CacheId
 
-	if id, ok := r.registry[query.hash]; ok {
-		queryId = id
+	if retrievedCacheId, ok := r.registry[query.hash]; ok {
+		cacheId = retrievedCacheId
 	} else {
-		queryId = r.caches.Size()
+		cacheId = r.caches.Size()
 		r.entityLinker.CopyLinkedEntitiesInto(r.linkedEntitiesBuffer)
-		var matchedIds = make([]uint, len(query.match))
-		var excludedIds = make([]uint, len(query.exclude))
-		var oneOfIds = make([]uint, len(query.one))
+		var matchedIds = make([]component.Id, len(query.match))
+		var excludedIds = make([]component.Id, len(query.exclude))
+		var oneOfIds = make([]component.Id, len(query.one))
 
 		for index, componentType := range query.match {
 			var componentResolver = r.componentLinker.Link(componentType)
@@ -51,13 +52,13 @@ func (r *Registry) Resolve(query *Info) *Cache {
 			var componentResolver = r.componentLinker.Link(componentType)
 			oneOfIds[index] = componentResolver.GetComponentId()
 		}
-		var queryCache = newCache(r.defaultCacheSize, queryId, matchedIds, excludedIds, oneOfIds)
+		var queryCache = newCache(r.defaultCacheSize, cacheId, matchedIds, excludedIds, oneOfIds)
 
-		r.caches.Set(queryId, queryCache)
-		r.registry[query.hash] = queryId
+		r.caches.Set(cacheId, queryCache)
+		r.registry[query.hash] = cacheId
 	}
 
-	return r.caches.Get(queryId)
+	return r.caches.Get(cacheId)
 }
 
 func (r *Registry) UpdateLinks() {
