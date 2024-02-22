@@ -1,25 +1,26 @@
 package entity
 
 import (
+	"github.com/andrei-cosmin/hakkt/entity"
 	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/bits-and-blooms/bitset"
 	"github.com/gammazero/deque"
 )
 
 type Linker struct {
-	pool             *deque.Deque[uint]
+	pool             *deque.Deque[entity.Id]
 	linkedEntities   *bitset.BitSet
 	scheduledRemoves *bitset.BitSet
-	entityCursor     uint
+	entityIdCursor   entity.Id
 	state.State
 }
 
 func NewLinker(size uint) *Linker {
 	return &Linker{
-		pool:             deque.New[uint](),
+		pool:             deque.New[entity.Id](),
 		linkedEntities:   bitset.New(size),
 		scheduledRemoves: bitset.New(size),
-		entityCursor:     0,
+		entityIdCursor:   0,
 		State:            state.New(),
 	}
 }
@@ -28,12 +29,12 @@ func (l *Linker) CopyLinkedEntitiesInto(set *bitset.BitSet) {
 	l.linkedEntities.CopyFull(set)
 }
 
-func (l *Linker) Link() uint {
-	var entityId uint
+func (l *Linker) Link() entity.Id {
+	var entityId entity.Id
 
 	if l.pool.Len() == 0 {
-		entityId = l.entityCursor
-		l.entityCursor++
+		entityId = l.entityIdCursor
+		l.entityIdCursor++
 	} else {
 		entityId = l.pool.PopFront()
 	}
@@ -43,7 +44,7 @@ func (l *Linker) Link() uint {
 	return entityId
 }
 
-func (l *Linker) Unlink(entityId uint) {
+func (l *Linker) Unlink(entityId entity.Id) {
 	if !l.linkedEntities.Test(entityId) {
 		return
 	}

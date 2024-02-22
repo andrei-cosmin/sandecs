@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"github.com/andrei-cosmin/hakkt/component"
+	"github.com/andrei-cosmin/hakkt/entity"
 	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
 	internalEntity "github.com/andrei-cosmin/hakkt/internal/entity"
 	internalQuery "github.com/andrei-cosmin/hakkt/internal/query"
@@ -33,12 +34,12 @@ func Filter(s *Sandbox, query query.Query) query.Response {
 	return s.queryRegistry.Resolve(query.Get())
 }
 
-func LinkEntity(s *Sandbox) uint {
+func LinkEntity(s *Sandbox) entity.Id {
 	return s.entityLinker.Link()
 }
 
-func UnlinkEntity(s *Sandbox, entity uint) {
-	s.entityLinker.Unlink(entity)
+func UnlinkEntity(s *Sandbox, entityId entity.Id) {
+	s.entityLinker.Unlink(entityId)
 }
 
 func GetComponentLinker[T component.Component](s *Sandbox) component.Linker[T] {

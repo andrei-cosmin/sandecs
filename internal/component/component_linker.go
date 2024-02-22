@@ -2,12 +2,13 @@ package component
 
 import (
 	"github.com/andrei-cosmin/hakkt/component"
+	"github.com/andrei-cosmin/hakkt/entity"
 	"github.com/andrei-cosmin/hakkt/internal/sparse"
 	"github.com/bits-and-blooms/bitset"
 )
 
 type Linker struct {
-	componentId      uint
+	componentId      component.Id
 	componentType    string
 	callback         func()
 	components       *sparse.Array[*component.Component]
@@ -15,7 +16,7 @@ type Linker struct {
 	linkedEntities   *bitset.BitSet
 }
 
-func newLinker(size uint, componentId uint, componentType string, callback func()) *Linker {
+func newLinker(size uint, componentId component.Id, componentType string, callback func()) *Linker {
 	return &Linker{
 		componentId:      componentId,
 		componentType:    componentType,
@@ -26,33 +27,33 @@ func newLinker(size uint, componentId uint, componentType string, callback func(
 	}
 }
 
-func (r *Linker) Link(entity uint, component *component.Component) {
-	r.linkedEntities.Set(entity)
-	r.components.Set(entity, component)
+func (r *Linker) Link(entityId entity.Id, component *component.Component) {
+	r.linkedEntities.Set(entityId)
+	r.components.Set(entityId, component)
 	r.callback()
 }
 
-func (r *Linker) Get(entity uint) *component.Component {
-	return r.components.Get(entity)
+func (r *Linker) Get(entityId entity.Id) *component.Component {
+	return r.components.Get(entityId)
 }
 
-func (r *Linker) Has(entity uint) bool {
-	return r.linkedEntities.Test(entity)
+func (r *Linker) Has(entityId entity.Id) bool {
+	return r.linkedEntities.Test(entityId)
 }
 
-func (r *Linker) Remove(entity uint) {
-	if !r.Has(entity) {
+func (r *Linker) Remove(entityId entity.Id) {
+	if !r.Has(entityId) {
 		return
 	}
 
-	if r.scheduledRemoves.Test(entity) {
+	if r.scheduledRemoves.Test(entityId) {
 		return
 	}
-	r.scheduledRemoves.Set(entity)
+	r.scheduledRemoves.Set(entityId)
 	r.callback()
 }
 
-func (r *Linker) GetComponentId() uint {
+func (r *Linker) GetComponentId() component.Id {
 	return r.componentId
 }
 
