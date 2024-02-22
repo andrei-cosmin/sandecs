@@ -1,12 +1,17 @@
 package component
 
+import (
+	"github.com/andrei-cosmin/hakkt/entity"
+)
+
 type Id = uint
 
-type Component interface{}
+type Component = interface{}
 
 type Linker[T Component] interface {
-	Link(entity uint, component T)
-	Get(entity uint) *T
-	Has(entity uint) bool
-	Remove(entity uint)
+	Link(entity entity.Id)
+	Get(entity entity.Id) *T
+	Has(entity entity.Id) bool
+	Unlink(entity entity.Id)
+	ComponentId() Id
 }

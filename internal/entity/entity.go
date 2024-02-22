@@ -25,13 +25,12 @@ func NewLinker(size uint) *Linker {
 	}
 }
 
-func (l *Linker) CopyLinkedEntitiesInto(set *bitset.BitSet) {
-	l.linkedEntities.CopyFull(set)
+func (l *Linker) EntityIds() *bitset.BitSet {
+	return l.linkedEntities
 }
 
 func (l *Linker) Link() entity.Id {
 	var entityId entity.Id
-
 	if l.pool.Len() == 0 {
 		entityId = l.entityIdCursor
 		l.entityIdCursor++
@@ -59,6 +58,6 @@ func (l *Linker) GetScheduledRemoves() *bitset.BitSet {
 }
 
 func (l *Linker) Refresh() {
-	l.Reset()
 	l.scheduledRemoves.ClearAll()
+	l.Reset()
 }
