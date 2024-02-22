@@ -3,57 +3,49 @@ package sandbox
 import (
 	"github.com/andrei-cosmin/hakkt/component"
 	"github.com/andrei-cosmin/hakkt/entity"
-	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
-	internalEntity "github.com/andrei-cosmin/hakkt/internal/entity"
-	internalQuery "github.com/andrei-cosmin/hakkt/internal/query"
-	"github.com/andrei-cosmin/hakkt/marker"
-	"github.com/andrei-cosmin/hakkt/query"
+	"github.com/andrei-cosmin/hakkt/filter"
+	"github.com/andrei-cosmin/hakkt/internal/sandbox"
 )
-
-type Sandbox struct {
-	componentLinker *internalComponent.LinkManager
-	entityLinker    *internalEntity.Linker
-	queryRegistry   *internalQuery.Registry
-}
 
 const sandboxDefaultSize = 128
 
-func New() *Sandbox {
-	var componentLinker = internalComponent.NewLinkManager(sandboxDefaultSize)
-	var entityLinker = internalEntity.NewLinker(sandboxDefaultSize)
-	var sandbox = &Sandbox{
-		componentLinker: componentLinker,
-		entityLinker:    entityLinker,
-		queryRegistry:   internalQuery.NewRegistry(sandboxDefaultSize, entityLinker, componentLinker),
-	}
-	Update(sandbox)
-	return sandbox
+type Sandbox struct {
+	internal *sandbox.Sandbox
 }
 
-func Filter(s *Sandbox, query query.Query) query.Response {
-	return s.queryRegistry.Resolve(query.Get())
+func New() *Sandbox {
+	box := &Sandbox{
+		internal: sandbox.New(sandboxDefaultSize),
+	}
+	Update(box)
+	return box
+}
+
+func Filter(s *Sandbox, filters ...filter.Filter) entity.View {
+	rules := make([]sandbox.Rule, 0)
+	for index := range filters {
+		rules = append(rules, filters[index].Rules...)
+	}
+	return sandbox.LinkFilter(s.internal, rules)
 }
 
 func LinkEntity(s *Sandbox) entity.Id {
-	return s.entityLinker.Link()
+	return s.internal.LinkEntity()
 }
 
 func UnlinkEntity(s *Sandbox, entityId entity.Id) {
-	s.entityLinker.Unlink(entityId)
+	s.internal.UnlinkEntity(entityId)
 }
 
-func GetComponentLinker[T component.Component](s *Sandbox) component.Linker[T] {
-	var resolver = s.componentLinker.Link(marker.Symbol[T]())
-	return &resolverWrapper[T]{
-		internalResolver: resolver,
-	}
+func ComponentLinker[T component.Component](s *Sandbox) component.Linker[T] {
+	registration := sandbox.ComponentRegistration[T]{}
+	s.internal.Accept(&registration)
+	return registration.GetLinker()
 }
 
 func Update(s *Sandbox) {
-	if s.componentLinker.IsUpdated() && s.entityLinker.IsUpdated() {
+	if s.internal.IsUpdated() {
 		return
 	}
-	s.componentLinker.UpdateLinks(s.entityLinker.GetScheduledRemoves())
-	s.queryRegistry.UpdateLinks()
-	s.entityLinker.Refresh()
+	s.internal.Update()
 }

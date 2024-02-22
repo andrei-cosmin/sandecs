@@ -10,6 +10,8 @@ github.com/hashicorp/go-set v0.1.14 h1:ZU7JyS6QGueDuXYldjcuyKLR0XV14eOKcsQlGddXG
 github.com/hashicorp/go-set v0.1.14/go.mod h1:FH9zJxnQYHPlZ7j9JaoQjZOFPBStOrelKOE11Wjwirc=
 github.com/mlange-42/arche v0.10.1 h1:zJMg7UA9mMrAMskmHD28yAo3YlP1Jrkvdx91/3bpidI=
 github.com/mlange-42/arche v0.10.1/go.mod h1:gJ5J8vBreqrf4TcBomBFPGnWdE5P3qa4LtxYHn1gDcg=
+github.com/mlange-42/arche v0.11.0 h1:zVvRlhYmZQBYKgXJQ4F6/4trEVmTKp3LrRtrNbRjwJE=
+github.com/mlange-42/arche v0.11.0/go.mod h1:gJ5J8vBreqrf4TcBomBFPGnWdE5P3qa4LtxYHn1gDcg=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/shoenig/test v0.6.6 h1:Oe8TPH9wAbv++YPNDKJWUnI8Q4PPWCx3UbOfH+FxiMU=

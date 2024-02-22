@@ -1,8 +1,9 @@
-package query
+package filter
 
 import (
 	"github.com/andrei-cosmin/hakkt/component"
 	"github.com/andrei-cosmin/hakkt/entity"
+	"github.com/andrei-cosmin/hakkt/internal/api"
 	"github.com/andrei-cosmin/hakkt/internal/state"
 	"github.com/bits-and-blooms/bitset"
 )
@@ -11,9 +12,9 @@ type CacheId = uint
 
 type Cache struct {
 	cacheId              CacheId
-	matchedComponentIds  []component.Id
+	requiredComponentIds []component.Id
 	excludedComponentIds []component.Id
-	oneOfComponentIds    []component.Id
+	unionComponentIds    []component.Id
 	linkMarker           *bitset.BitSet
 	removeMarker         *bitset.BitSet
 	linkedEntities       *bitset.BitSet
@@ -21,12 +22,11 @@ type Cache struct {
 	state.State
 }
 
-func newCache(size uint, cacheId CacheId, matchedIds []component.Id, excludedIds []component.Id, oneOfIds []component.Id) *Cache {
+func newCache(size uint, filterRules api.FilterRules) *Cache {
 	return &Cache{
-		cacheId:              cacheId,
-		matchedComponentIds:  matchedIds,
-		excludedComponentIds: excludedIds,
-		oneOfComponentIds:    oneOfIds,
+		requiredComponentIds: filterRules.RequiredComponentIds(),
+		excludedComponentIds: filterRules.ExcludedComponentIds(),
+		unionComponentIds:    filterRules.UnionComponentIds(),
 		linkMarker:           bitset.New(size),
 		removeMarker:         bitset.New(size),
 		linkedEntities:       bitset.New(size),
@@ -34,7 +34,7 @@ func newCache(size uint, cacheId CacheId, matchedIds []component.Id, excludedIds
 	}
 }
 
-func (c *Cache) GetEntities() []entity.Id {
+func (c *Cache) EntityIds() []entity.Id {
 	if !c.IsUpdated() {
 		c.Reset()
 		c.entityIdsCache = c.entityIdsCache[:0]

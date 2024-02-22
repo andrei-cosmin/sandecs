@@ -17,11 +17,19 @@ func (a *Array[T]) Get(index uint) T {
 	return a.container[index]
 }
 
+func (a *Array[T]) GetPointer(index uint) *T {
+	return &a.container[index]
+}
+
 func (a *Array[T]) Set(index uint, value T) {
+	a.EnsureCapacity(index)
+	a.container[index] = value
+}
+
+func (a *Array[T]) EnsureCapacity(index uint) {
 	if index >= uint(len(a.container)) {
 		a.resize(nextPowerOfTwo(index + 1))
 	}
-	a.container[index] = value
 }
 
 func (a *Array[T]) Size() uint {
