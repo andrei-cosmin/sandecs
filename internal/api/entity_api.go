@@ -14,6 +14,7 @@ type EntityLinker interface {
 	Unlink(entityId entity.Id)
 	EntityIds() *bitset.BitSet
 	GetScheduledRemoves() *bitset.BitSet
+	Update()
 	IsUpdated() bool
 	Refresh()
 }

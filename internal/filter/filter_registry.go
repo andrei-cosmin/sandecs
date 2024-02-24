@@ -32,7 +32,11 @@ func (r *Registry) Register(filterRules api.FilterRules) entity.View {
 
 func (r *Registry) UpdateLinks() {
 	for _, cache := range r.registry {
-		r.entityLinker.EntityIds().CopyFull(r.linkedEntitiesBuffer)
+		if len(cache.requiredComponentIds) == 0 && len(cache.excludedComponentIds) == 0 {
+			r.linkedEntitiesBuffer.ClearAll()
+		} else {
+			r.entityLinker.EntityIds().CopyFull(r.linkedEntitiesBuffer)
+		}
 
 		for index := range cache.requiredComponentIds {
 			var componentResolver = r.componentLinkManager.Get(cache.requiredComponentIds[index])

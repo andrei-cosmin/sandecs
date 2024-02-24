@@ -7,18 +7,24 @@ import (
 	"github.com/andrei-cosmin/hakkt/internal/sandbox"
 )
 
-const sandboxDefaultSize = 128
+const DefaultNumEntities = 128
+const DefaultNumComponents = 16
+const DefaultPoolCapacity = 1024
 
 type Sandbox struct {
 	internal *sandbox.Sandbox
 }
 
-func New() *Sandbox {
+func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
 	box := &Sandbox{
-		internal: sandbox.New(sandboxDefaultSize),
+		internal: sandbox.New(numEntities, numComponents, poolCapacity),
 	}
 	Update(box)
 	return box
+}
+
+func NewDefault() *Sandbox {
+	return New(DefaultNumEntities, DefaultNumComponents, DefaultPoolCapacity)
 }
 
 func Filter(s *Sandbox, filters ...filter.Filter) entity.View {
@@ -35,6 +41,10 @@ func LinkEntity(s *Sandbox) entity.Id {
 
 func UnlinkEntity(s *Sandbox, entityId entity.Id) {
 	s.internal.UnlinkEntity(entityId)
+}
+
+func IsEntityLinked(s *Sandbox, entityId entity.Id) bool {
+	return s.internal.IsEntityLinked(entityId)
 }
 
 func ComponentLinker[T component.Component](s *Sandbox) component.Linker[T] {

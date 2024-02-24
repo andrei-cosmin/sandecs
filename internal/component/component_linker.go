@@ -4,42 +4,52 @@ import (
 	"github.com/andrei-cosmin/hakkt/component"
 	"github.com/andrei-cosmin/hakkt/entity"
 	"github.com/andrei-cosmin/hakkt/internal/api"
-	"github.com/andrei-cosmin/hakkt/internal/sparse"
 	"github.com/bits-and-blooms/bitset"
 )
 
 type linker[T component.Component] struct {
+	poolCapacity     uint
 	componentId      component.Id
 	componentType    string
+	entityLinker     api.EntityContainer
 	callback         func()
-	components       *sparse.Array[*T]
+	components       table[T]
 	scheduledRemoves *bitset.BitSet
 	linkedEntities   *bitset.BitSet
 }
 
-func newLinker[T component.Component](size uint, componentId component.Id, componentType string, callback func()) api.ComponentLinker {
+func newLinker[T component.Component](size uint, poolCapacity uint, componentId component.Id, componentType string, entityLinker api.EntityContainer, callback func()) api.ComponentLinker {
+	var table table[T]
+	if poolCapacity > 0 {
+		table = newPooledTable[T](size, poolCapacity)
+	} else {
+		table = newBasicTable[T](size)
+	}
+
 	return &linker[T]{
+		poolCapacity:     poolCapacity,
 		componentId:      componentId,
 		componentType:    componentType,
+		entityLinker:     entityLinker,
 		callback:         callback,
-		components:       sparse.New[*T](size),
+		components:       table,
 		scheduledRemoves: bitset.New(size),
 		linkedEntities:   bitset.New(size),
 	}
 }
 
 func (r *linker[T]) Link(entityId entity.Id) {
-	if r.linkedEntities.Test(entityId) {
+	if !r.entityLinker.EntityIds().Test(entityId) || r.linkedEntities.Test(entityId) {
 		return
 	}
 
 	r.linkedEntities.Set(entityId)
-	r.components.Set(entityId, new(T))
+	r.components.set(entityId)
 	r.callback()
 }
 
 func (r *linker[T]) Get(entityId entity.Id) *T {
-	return r.components.Get(entityId)
+	return r.components.get(entityId)
 }
 
 func (r *linker[T]) Has(entityId entity.Id) bool {
@@ -68,7 +78,7 @@ func (r *linker[T]) EntityIds() *bitset.BitSet {
 
 func (r *linker[T]) Update(scheduledEntityRemoves *bitset.BitSet) {
 	r.scheduledRemoves.InPlaceUnion(scheduledEntityRemoves)
-	r.components.Clear(r.scheduledRemoves)
+	r.components.clear(r.scheduledRemoves)
 	r.linkedEntities.InPlaceDifference(r.scheduledRemoves)
 	r.scheduledRemoves.ClearAll()
 }

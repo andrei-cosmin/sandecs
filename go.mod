@@ -2,8 +2,6 @@ module github.com/andrei-cosmin/hakkt
 
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
-	github.com/gammazero/deque v0.2.1
-	github.com/hashicorp/go-set v0.1.14
 	github.com/mlange-42/arche v0.11.0
 )
 
