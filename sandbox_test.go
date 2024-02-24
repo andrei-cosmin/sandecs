@@ -1,9 +1,9 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/entity"
-	"github.com/andrei-cosmin/hakkt/filter"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
+	"github.com/andrei-cosmin/sandecs/filter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"math/rand/v2"

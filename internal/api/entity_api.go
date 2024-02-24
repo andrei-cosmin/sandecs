@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/andrei-cosmin/hakkt/entity"
+	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/bits-and-blooms/bitset"
 )
 
@@ -15,6 +15,6 @@ type EntityLinker interface {
 	EntityIds() *bitset.BitSet
 	GetScheduledRemoves() *bitset.BitSet
 	Update()
-	IsUpdated() bool
+	IsClear() bool
 	Refresh()
 }

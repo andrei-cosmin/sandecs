@@ -1,7 +1,7 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
+	"github.com/andrei-cosmin/sandecs/component"
 )
 
 type filterRules struct {

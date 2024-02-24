@@ -1,9 +1,8 @@
 package component
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/internal/pool"
-	"github.com/andrei-cosmin/hakkt/internal/sparse"
+	"github.com/andrei-cosmin/sandata/data"
+	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/bits-and-blooms/bitset"
 )
 
@@ -14,12 +13,12 @@ type table[T any] interface {
 }
 
 type basicTable[T any] struct {
-	content sparse.Array[*T]
+	content data.Array[*T]
 }
 
 func newBasicTable[T component.Component](tableSize uint) *basicTable[T] {
 	return &basicTable[T]{
-		content: *sparse.New[*T](tableSize),
+		content: *data.NewArray[*T](tableSize),
 	}
 }
 
@@ -36,14 +35,14 @@ func (t *basicTable[T]) clear(set *bitset.BitSet) {
 }
 
 type pooledTable[T any] struct {
-	content sparse.Array[*T]
-	pool    pool.Pool[*T]
+	content data.Array[*T]
+	pool    data.Pool[*T]
 }
 
 func newPooledTable[T component.Component](tableSize, poolSize uint) *pooledTable[T] {
 	return &pooledTable[T]{
-		content: *sparse.New[*T](tableSize),
-		pool:    *pool.New[*T](poolSize),
+		content: *data.NewArray[*T](tableSize),
+		pool:    *data.NewPool[*T](poolSize),
 	}
 }
 

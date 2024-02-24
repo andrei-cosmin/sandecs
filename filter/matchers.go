@@ -1,8 +1,8 @@
 package filter
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/internal/sandbox"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/internal/sandbox"
 )
 
 type Filter struct {

@@ -1,8 +1,8 @@
-module github.com/andrei-cosmin/hakkt
+module github.com/andrei-cosmin/sandecs
 
 require (
+	github.com/andrei-cosmin/sandata v1.0.0
 	github.com/bits-and-blooms/bitset v1.13.0
-	github.com/mlange-42/arche v0.11.0
 )
 
 require (
@@ -12,4 +12,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-go 1.22
+go 1.22.0
