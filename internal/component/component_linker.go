@@ -38,14 +38,16 @@ func newLinker[T component.Component](size uint, poolCapacity uint, componentId 
 	}
 }
 
-func (r *linker[T]) Link(entityId entity.Id) {
+func (r *linker[T]) Link(entityId entity.Id) *T {
 	if !r.entityLinker.EntityIds().Test(entityId) || r.linkedEntities.Test(entityId) {
-		return
+		return nil
 	}
 
 	r.linkedEntities.Set(entityId)
 	r.components.set(entityId)
 	r.callback()
+
+	return r.components.get(entityId)
 }
 
 func (r *linker[T]) Get(entityId entity.Id) *T {
