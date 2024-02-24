@@ -349,6 +349,10 @@ func (suite *SandboxTestSuite) TestSimplePooling() {
 
 func (suite *SandboxTestSuite) TestSimpleFilter() {
 	positionFilter := Filter(suite.sandbox, filter.Match[position]())
+	duplicateFilter := Filter(suite.sandbox, filter.Match[position]())
+	assert.Equal(suite.T(), positionFilter, duplicateFilter)
+	Filter(suite.sandbox, filter.Match[position]())
+
 	assert.Len(suite.T(), positionFilter.EntityIds(), 0, filterIncorrectNumEntitiesMsg)
 	for i := 0; i < numEntities; i++ {
 		LinkEntity(suite.sandbox)

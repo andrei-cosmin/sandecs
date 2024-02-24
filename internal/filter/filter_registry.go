@@ -4,34 +4,46 @@ import (
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
+	"strconv"
+	"strings"
 )
 
 type Registry struct {
 	entityLinker         api.EntityContainer
 	componentLinkManager api.ComponentLinkRetriever
-	registry             []*Cache
+	hashes               map[string]int
+	caches               []*Cache
 	linkedEntitiesBuffer *bitset.BitSet
 	defaultCacheSize     uint
+	stringBuilder        strings.Builder
 }
 
 func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManager api.ComponentLinkManager) *Registry {
 	return &Registry{
 		entityLinker:         entityLinker,
 		componentLinkManager: componentLinkManager,
-		registry:             make([]*Cache, 0),
+		hashes:               make(map[string]int),
+		caches:               make([]*Cache, 0),
 		linkedEntitiesBuffer: bitset.New(size),
 		defaultCacheSize:     size,
 	}
 }
 
 func (r *Registry) Register(filterRules api.FilterRules) entity.View {
+	hash := r.hashFilter(filterRules)
+
+	if cacheIndex, ok := r.hashes[hash]; ok {
+		return r.caches[cacheIndex]
+	}
+
 	filterCache := newCache(r.defaultCacheSize, filterRules)
-	r.registry = append(r.registry, filterCache)
+	r.hashes[hash] = len(r.caches)
+	r.caches = append(r.caches, filterCache)
 	return filterCache
 }
 
 func (r *Registry) UpdateLinks() {
-	for _, cache := range r.registry {
+	for _, cache := range r.caches {
 		if len(cache.requiredComponentIds) == 0 && len(cache.excludedComponentIds) == 0 {
 			r.linkedEntitiesBuffer.ClearAll()
 		} else {
@@ -55,4 +67,28 @@ func (r *Registry) UpdateLinks() {
 
 		cache.updateWith(r.linkedEntitiesBuffer)
 	}
+}
+
+func (r *Registry) hashFilter(rules api.FilterRules) string {
+	r.stringBuilder.Reset()
+
+	for _, componentId := range rules.RequiredComponentIds() {
+		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
+		r.stringBuilder.WriteString(",")
+	}
+	r.stringBuilder.WriteString("/")
+
+	for _, componentId := range rules.ExcludedComponentIds() {
+		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
+		r.stringBuilder.WriteString(",")
+	}
+	r.stringBuilder.WriteString("/")
+
+	for _, componentId := range rules.UnionComponentIds() {
+		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
+		r.stringBuilder.WriteString(",")
+	}
+	r.stringBuilder.WriteString("/")
+
+	return r.stringBuilder.String()
 }
