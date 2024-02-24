@@ -135,8 +135,7 @@ func (suite *SandboxTestSuite) TestEntityRecyclingRandom() {
 func (suite *SandboxTestSuite) TestSimpleLinkingComponents() {
 	for i := 0; i < numEntities; i++ {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
-		suite.positionLinker.Get(entity.Id(i)).X = float64(i)
+		suite.positionLinker.Link(entity.Id(i)).X = float64(i)
 		suite.assertComponent(suite.positionLinker, entity.Id(i), componentValueMsg, positionComponent, i)
 	}
 
@@ -188,23 +187,19 @@ func (suite *SandboxTestSuite) TestComponentForInvalidEntity() {
 func (suite *SandboxTestSuite) TestHeavyLinkingComponents() {
 	for i := 0; i < numEntities; i++ {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
-		suite.positionLinker.Get(entity.Id(i)).X = float64(i)
+		suite.positionLinker.Link(entity.Id(i)).X = float64(i)
 		suite.assertComponent(suite.positionLinker, entity.Id(i), componentNotLinkedMsg, positionComponent, i)
 	}
 	for i := 0; i < numEntities/2; i++ {
-		suite.velocityLinker.Link(entity.Id(i))
-		suite.velocityLinker.Get(entity.Id(i)).Y = float64(i * 2)
+		suite.velocityLinker.Link(entity.Id(i)).Y = float64(i * 2)
 		suite.assertComponent(suite.velocityLinker, entity.Id(i), componentNotLinkedMsg, velocityComponent, i)
 	}
 	for i := numEntities / 2; i < numEntities; i++ {
-		suite.healthLinker.Link(entity.Id(i))
-		suite.healthLinker.Get(entity.Id(i)).value = float64(i / 2)
+		suite.healthLinker.Link(entity.Id(i)).value = float64(i / 2)
 		suite.assertComponent(suite.healthLinker, entity.Id(i), componentNotLinkedMsg, healthComponent, i)
 	}
 	for i := numEntities / 4; i < numEntities*3/4; i++ {
-		suite.armorLinker.Link(entity.Id(i))
-		suite.armorLinker.Get(entity.Id(i)).value = i / 10
+		suite.armorLinker.Link(entity.Id(i)).value = i / 10
 		suite.assertComponent(suite.armorLinker, entity.Id(i), componentNotLinkedMsg, armorComponent, i, i)
 	}
 
