@@ -10,18 +10,19 @@ import (
 )
 
 type Sandbox struct {
-	componentLinkManager api.ComponentLinkManager
 	entityLinker         api.EntityLinker
-	queryRegistry        api.FilterRegistry
+	componentLinkManager api.ComponentLinkManager
+	filterRegistry       api.FilterRegistry
 }
 
-func New(size uint) *Sandbox {
-	componentLinkManager := internalComponent.NewLinkManager(size)
-	entityLinker := internalEntity.NewLinker(size)
+func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
+	entityLinker := internalEntity.NewLinker(numEntities)
+	componentLinkManager := internalComponent.NewLinkManager(numEntities, numComponents, poolCapacity, entityLinker)
+	filterRegistry := internalFilter.NewRegistry(numEntities, entityLinker, componentLinkManager)
 	sandbox := &Sandbox{
-		componentLinkManager: componentLinkManager,
 		entityLinker:         entityLinker,
-		queryRegistry:        internalFilter.NewRegistry(size, entityLinker, componentLinkManager),
+		componentLinkManager: componentLinkManager,
+		filterRegistry:       filterRegistry,
 	}
 	return sandbox
 }
@@ -38,9 +39,14 @@ func (s *Sandbox) UnlinkEntity(entityId entity.Id) {
 	s.entityLinker.Unlink(entityId)
 }
 
+func (s *Sandbox) IsEntityLinked(entityId entity.Id) bool {
+	return s.entityLinker.EntityIds().Test(entityId)
+}
+
 func (s *Sandbox) Update() {
+	s.entityLinker.Update()
 	s.componentLinkManager.UpdateLinks(s.entityLinker.GetScheduledRemoves())
-	s.queryRegistry.UpdateLinks()
+	s.filterRegistry.UpdateLinks()
 	s.entityLinker.Refresh()
 }
 
@@ -60,7 +66,7 @@ func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 		ruleSets[rule.RuleType()] = append(ruleSets[rule.RuleType()], rule.ComponentId())
 	}
 
-	return s.queryRegistry.Register(&filterRules{
+	return s.filterRegistry.Register(&filterRules{
 		match:   ruleSets[Match],
 		exclude: ruleSets[Exclude],
 		one:     ruleSets[Union],

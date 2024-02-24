@@ -10,16 +10,22 @@ import (
 )
 
 type linkManager struct {
+	poolCapacity      uint
+	defaultLinkerSize uint
 	linkedComponents  map[string]component.Id
+	entityLinker      api.EntityContainer
 	componentLinkers  *sparse.Array[api.ComponentLinker]
 	componentIdCursor component.Id
 	state.State
 }
 
-func NewLinkManager(size uint) api.ComponentLinkManager {
+func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker api.EntityContainer) api.ComponentLinkManager {
 	return &linkManager{
+		poolCapacity:      poolCapacity,
+		defaultLinkerSize: numEntities,
 		linkedComponents:  make(map[string]component.Id),
-		componentLinkers:  sparse.New[api.ComponentLinker](size),
+		entityLinker:      entityLinker,
+		componentLinkers:  sparse.New[api.ComponentLinker](numComponents),
 		componentIdCursor: 0,
 		State:             state.New(),
 	}
@@ -53,7 +59,7 @@ func RegisterLinker[T component.Component](componentLinkManager api.ComponentLin
 		l.linkedComponents[componentType] = l.componentIdCursor
 		l.componentLinkers.Set(
 			l.componentIdCursor,
-			newLinker[T](l.componentLinkers.Size(), l.componentIdCursor, componentType, l.Mark),
+			newLinker[T](l.defaultLinkerSize, l.poolCapacity, l.componentIdCursor, componentType, l.entityLinker, l.Mark),
 		)
 		l.componentIdCursor++
 	}
