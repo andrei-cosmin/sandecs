@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/entity"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
 )
 
 type FilterRules interface {

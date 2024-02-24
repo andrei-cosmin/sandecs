@@ -1,8 +1,8 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/internal/api"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/internal/api"
 )
 
 type Type = uint8

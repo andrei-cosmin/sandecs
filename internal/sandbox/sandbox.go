@@ -1,12 +1,12 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/entity"
-	"github.com/andrei-cosmin/hakkt/internal/api"
-	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
-	internalEntity "github.com/andrei-cosmin/hakkt/internal/entity"
-	internalFilter "github.com/andrei-cosmin/hakkt/internal/filter"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
+	"github.com/andrei-cosmin/sandecs/internal/api"
+	internalComponent "github.com/andrei-cosmin/sandecs/internal/component"
+	internalEntity "github.com/andrei-cosmin/sandecs/internal/entity"
+	internalFilter "github.com/andrei-cosmin/sandecs/internal/filter"
 )
 
 type Sandbox struct {
@@ -28,7 +28,7 @@ func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
 }
 
 func (s *Sandbox) IsUpdated() bool {
-	return s.componentLinkManager.IsUpdated() && s.entityLinker.IsUpdated()
+	return s.componentLinkManager.IsClear() && s.entityLinker.IsClear()
 }
 
 func (s *Sandbox) LinkEntity() entity.Id {

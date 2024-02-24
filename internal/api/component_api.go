@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
+	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/bits-and-blooms/bitset"
 )
 
@@ -13,7 +13,7 @@ type ComponentLinkManager interface {
 	Get(componentId component.Id) ComponentLinker
 	UpdateLinks(scheduledEntityRemoves *bitset.BitSet)
 	Accept(registration ComponentRegistration)
-	IsUpdated() bool
+	IsClear() bool
 }
 
 type ComponentLinker interface {

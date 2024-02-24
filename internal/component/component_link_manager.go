@@ -1,10 +1,10 @@
 package component
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/internal/api"
-	"github.com/andrei-cosmin/hakkt/internal/sparse"
-	"github.com/andrei-cosmin/hakkt/internal/state"
+	"github.com/andrei-cosmin/sandata/data"
+	"github.com/andrei-cosmin/sandata/flag"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
 	"reflect"
 )
@@ -14,9 +14,9 @@ type linkManager struct {
 	defaultLinkerSize uint
 	linkedComponents  map[string]component.Id
 	entityLinker      api.EntityContainer
-	componentLinkers  *sparse.Array[api.ComponentLinker]
+	componentLinkers  *data.Array[api.ComponentLinker]
 	componentIdCursor component.Id
-	state.State
+	flag.Flag
 }
 
 func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker api.EntityContainer) api.ComponentLinkManager {
@@ -25,9 +25,9 @@ func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker 
 		defaultLinkerSize: numEntities,
 		linkedComponents:  make(map[string]component.Id),
 		entityLinker:      entityLinker,
-		componentLinkers:  sparse.New[api.ComponentLinker](numComponents),
+		componentLinkers:  data.NewArray[api.ComponentLinker](numComponents),
 		componentIdCursor: 0,
-		State:             state.New(),
+		Flag:              flag.New(),
 	}
 }
 
@@ -40,7 +40,7 @@ func (l *linkManager) UpdateLinks(scheduledEntityRemoves *bitset.BitSet) {
 		resolver := l.componentLinkers.Get(index)
 		resolver.Update(scheduledEntityRemoves)
 	}
-	l.Reset()
+	l.Clear()
 }
 
 func (l *linkManager) Accept(registration api.ComponentRegistration) {
@@ -59,7 +59,7 @@ func RegisterLinker[T component.Component](componentLinkManager api.ComponentLin
 		l.linkedComponents[componentType] = l.componentIdCursor
 		l.componentLinkers.Set(
 			l.componentIdCursor,
-			newLinker[T](l.defaultLinkerSize, l.poolCapacity, l.componentIdCursor, componentType, l.entityLinker, l.Mark),
+			newLinker[T](l.defaultLinkerSize, l.poolCapacity, l.componentIdCursor, componentType, l.entityLinker, l.Set),
 		)
 		l.componentIdCursor++
 	}

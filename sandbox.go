@@ -1,10 +1,10 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/entity"
-	"github.com/andrei-cosmin/hakkt/filter"
-	"github.com/andrei-cosmin/hakkt/internal/sandbox"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
+	"github.com/andrei-cosmin/sandecs/filter"
+	"github.com/andrei-cosmin/sandecs/internal/sandbox"
 )
 
 const DefaultNumEntities = 128
@@ -16,11 +16,9 @@ type Sandbox struct {
 }
 
 func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
-	box := &Sandbox{
+	return &Sandbox{
 		internal: sandbox.New(numEntities, numComponents, poolCapacity),
 	}
-	Update(box)
-	return box
 }
 
 func NewDefault() *Sandbox {

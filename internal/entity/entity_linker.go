@@ -1,22 +1,22 @@
 package entity
 
 import (
-	"github.com/andrei-cosmin/hakkt/entity"
-	"github.com/andrei-cosmin/hakkt/internal/state"
+	"github.com/andrei-cosmin/sandata/flag"
+	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/bits-and-blooms/bitset"
 )
 
 type Linker struct {
 	linkedEntities   *bitset.BitSet
 	scheduledRemoves *bitset.BitSet
-	state.State
+	flag.Flag
 }
 
 func NewLinker(size uint) *Linker {
 	return &Linker{
 		linkedEntities:   bitset.New(size),
 		scheduledRemoves: bitset.New(size),
-		State:            state.New(),
+		Flag:             flag.New(),
 	}
 }
 
@@ -40,7 +40,7 @@ func (l *Linker) Unlink(entityId entity.Id) {
 	}
 
 	l.scheduledRemoves.Set(entityId)
-	l.Mark()
+	l.Set()
 }
 
 func (l *Linker) GetScheduledRemoves() *bitset.BitSet {
@@ -53,5 +53,5 @@ func (l *Linker) Update() {
 
 func (l *Linker) Refresh() {
 	l.scheduledRemoves.ClearAll()
-	l.Reset()
+	l.Clear()
 }

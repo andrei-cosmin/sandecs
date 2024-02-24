@@ -1,7 +1,7 @@
 package component
 
 import (
-	"github.com/andrei-cosmin/hakkt/entity"
+	"github.com/andrei-cosmin/sandecs/entity"
 )
 
 type Id = uint

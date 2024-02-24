@@ -1,9 +1,9 @@
 package sandbox
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/internal/api"
-	internalComponent "github.com/andrei-cosmin/hakkt/internal/component"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/internal/api"
+	internalComponent "github.com/andrei-cosmin/sandecs/internal/component"
 )
 
 type ComponentRegistration[T component.Component] struct {

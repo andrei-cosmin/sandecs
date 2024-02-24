@@ -1,10 +1,10 @@
 package filter
 
 import (
-	"github.com/andrei-cosmin/hakkt/component"
-	"github.com/andrei-cosmin/hakkt/entity"
-	"github.com/andrei-cosmin/hakkt/internal/api"
-	"github.com/andrei-cosmin/hakkt/internal/state"
+	"github.com/andrei-cosmin/sandata/flag"
+	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
+	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
 )
 
@@ -19,7 +19,7 @@ type Cache struct {
 	removeMarker         *bitset.BitSet
 	linkedEntities       *bitset.BitSet
 	entityIdsCache       []entity.Id
-	state.State
+	flag.Flag
 }
 
 func newCache(size uint, filterRules api.FilterRules) *Cache {
@@ -30,13 +30,13 @@ func newCache(size uint, filterRules api.FilterRules) *Cache {
 		linkMarker:           bitset.New(size),
 		removeMarker:         bitset.New(size),
 		linkedEntities:       bitset.New(size),
-		State:                state.New(),
+		Flag:                 flag.New(),
 	}
 }
 
 func (c *Cache) EntityIds() []entity.Id {
-	if !c.IsUpdated() {
-		c.Reset()
+	if !c.IsClear() {
+		c.Clear()
 		c.entityIdsCache = c.entityIdsCache[:0]
 
 		for entityId, hasNext := c.linkedEntities.NextSet(0); hasNext; entityId, hasNext = c.linkedEntities.NextSet(entityId + 1) {
@@ -52,7 +52,7 @@ func (c *Cache) linkAll(entities *bitset.BitSet) {
 		return
 	}
 
-	c.Mark()
+	c.Set()
 	c.linkedEntities.InPlaceUnion(entities)
 }
 
@@ -61,7 +61,7 @@ func (c *Cache) removeAll(entities *bitset.BitSet) {
 		return
 	}
 
-	c.Mark()
+	c.Set()
 	c.linkedEntities.InPlaceDifference(entities)
 }
 
