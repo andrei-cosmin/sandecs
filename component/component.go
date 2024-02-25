@@ -7,6 +7,7 @@ import (
 type Id = uint
 
 type Component = interface{}
+type Tag = string
 
 type BasicLinker interface {
 	Has(entity entity.Id) bool

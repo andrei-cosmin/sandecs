@@ -7,6 +7,7 @@ import (
 	internalComponent "github.com/andrei-cosmin/sandecs/internal/component"
 	internalEntity "github.com/andrei-cosmin/sandecs/internal/entity"
 	internalFilter "github.com/andrei-cosmin/sandecs/internal/filter"
+	"slices"
 )
 
 type Sandbox struct {
@@ -64,6 +65,10 @@ func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 	for _, rule := range rules {
 		s.Accept(rule.Registration())
 		ruleSets[rule.RuleType()] = append(ruleSets[rule.RuleType()], rule.ComponentId())
+	}
+
+	for ruleSetIndex := SetStart; ruleSetIndex < SetSize; ruleSetIndex++ {
+		slices.Sort(ruleSets[ruleSetIndex])
 	}
 
 	return s.filterRegistry.Register(&filterRules{

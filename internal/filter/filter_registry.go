@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
@@ -15,7 +16,6 @@ type Registry struct {
 	caches               []*Cache
 	linkedEntitiesBuffer *bitset.BitSet
 	defaultCacheSize     uint
-	stringBuilder        strings.Builder
 }
 
 func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManager api.ComponentLinkManager) *Registry {
@@ -30,7 +30,7 @@ func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManag
 }
 
 func (r *Registry) Register(filterRules api.FilterRules) entity.View {
-	hash := r.hashFilter(filterRules)
+	hash := hashFilter(filterRules)
 
 	if cacheIndex, ok := r.hashes[hash]; ok {
 		return r.caches[cacheIndex]
@@ -69,26 +69,20 @@ func (r *Registry) UpdateLinks() {
 	}
 }
 
-func (r *Registry) hashFilter(rules api.FilterRules) string {
-	r.stringBuilder.Reset()
+func hashFilter(rules api.FilterRules) string {
+	var stringBuilder strings.Builder
 
-	for _, componentId := range rules.RequiredComponentIds() {
-		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
-		r.stringBuilder.WriteString(",")
+	hashFilterComponentIds(&stringBuilder, rules.RequiredComponentIds())
+	hashFilterComponentIds(&stringBuilder, rules.ExcludedComponentIds())
+	hashFilterComponentIds(&stringBuilder, rules.UnionComponentIds())
+
+	return stringBuilder.String()
+}
+
+func hashFilterComponentIds(stringBuilder *strings.Builder, ids []component.Id) {
+	for _, componentId := range ids {
+		stringBuilder.WriteString(strconv.Itoa(int(componentId)))
+		stringBuilder.WriteString(",")
 	}
-	r.stringBuilder.WriteString("/")
-
-	for _, componentId := range rules.ExcludedComponentIds() {
-		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
-		r.stringBuilder.WriteString(",")
-	}
-	r.stringBuilder.WriteString("/")
-
-	for _, componentId := range rules.UnionComponentIds() {
-		r.stringBuilder.WriteString(strconv.Itoa(int(componentId)))
-		r.stringBuilder.WriteString(",")
-	}
-	r.stringBuilder.WriteString("/")
-
-	return r.stringBuilder.String()
+	stringBuilder.WriteString("/")
 }

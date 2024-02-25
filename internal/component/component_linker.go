@@ -19,11 +19,11 @@ type linker[T component.Component] struct {
 }
 
 func newLinker[T component.Component](size uint, poolCapacity uint, componentId component.Id, componentType string, entityLinker api.EntityContainer, callback func()) api.ComponentLinker {
-	var table table[T]
+	var componentTable table[T]
 	if poolCapacity > 0 {
-		table = newPooledTable[T](size, poolCapacity)
+		componentTable = newPooledTable[T](size, poolCapacity)
 	} else {
-		table = newBasicTable[T](size)
+		componentTable = newBasicTable[T](size)
 	}
 
 	return &linker[T]{
@@ -32,7 +32,7 @@ func newLinker[T component.Component](size uint, poolCapacity uint, componentId 
 		componentType:    componentType,
 		entityLinker:     entityLinker,
 		callback:         callback,
-		components:       table,
+		components:       componentTable,
 		scheduledRemoves: bitset.New(size),
 		linkedEntities:   bitset.New(size),
 	}
