@@ -50,18 +50,18 @@ func (r *Registry) UpdateLinks() {
 			r.entityLinker.EntityIds().CopyFull(r.linkedEntitiesBuffer)
 		}
 
-		for index := range cache.requiredComponentIds {
-			var componentResolver = r.componentLinkManager.Get(cache.requiredComponentIds[index])
+		for _, requiredId := range cache.requiredComponentIds {
+			var componentResolver = r.componentLinkManager.Get(requiredId)
 			r.linkedEntitiesBuffer.InPlaceIntersection(componentResolver.EntityIds())
 		}
 
-		for index := range cache.excludedComponentIds {
-			var componentResolver = r.componentLinkManager.Get(cache.excludedComponentIds[index])
+		for _, excludedId := range cache.excludedComponentIds {
+			var componentResolver = r.componentLinkManager.Get(excludedId)
 			r.linkedEntitiesBuffer.InPlaceDifference(componentResolver.EntityIds())
 		}
 
-		for index := range cache.unionComponentIds {
-			var componentResolver = r.componentLinkManager.Get(cache.unionComponentIds[index])
+		for _, unionId := range cache.unionComponentIds {
+			var componentResolver = r.componentLinkManager.Get(unionId)
 			r.linkedEntitiesBuffer.InPlaceUnion(componentResolver.EntityIds())
 		}
 

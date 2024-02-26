@@ -6,7 +6,6 @@ import (
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
-	"reflect"
 )
 
 type linkManager struct {
@@ -14,7 +13,7 @@ type linkManager struct {
 	defaultLinkerSize uint
 	linkedComponents  map[string]component.Id
 	entityLinker      api.EntityContainer
-	componentLinkers  *data.Array[api.ComponentLinker]
+	componentLinkers  data.Array[api.ComponentLinker]
 	componentIdCursor component.Id
 	flag.Flag
 }
@@ -25,7 +24,7 @@ func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker 
 		defaultLinkerSize: numEntities,
 		linkedComponents:  make(map[string]component.Id),
 		entityLinker:      entityLinker,
-		componentLinkers:  data.NewArray[api.ComponentLinker](numComponents),
+		componentLinkers:  *data.NewArray[api.ComponentLinker](numComponents),
 		componentIdCursor: 0,
 		Flag:              flag.New(),
 	}
@@ -36,33 +35,15 @@ func (l *linkManager) Get(componentId component.Id) api.ComponentLinker {
 }
 
 func (l *linkManager) UpdateLinks(scheduledEntityRemoves *bitset.BitSet) {
-	for index := uint(0); index < l.componentIdCursor; index++ {
+
+	for index := range l.componentIdCursor {
 		resolver := l.componentLinkers.Get(index)
 		resolver.Update(scheduledEntityRemoves)
+		resolver.Refresh()
 	}
 	l.Clear()
 }
 
-func (l *linkManager) Accept(registration api.ComponentRegistration) {
+func (l *linkManager) Accept(registration api.Registration) {
 	registration.Execute(l)
-}
-
-func RegisterLinker[T component.Component](componentLinkManager api.ComponentLinkManager) api.ComponentLinker {
-	var componentId component.Id
-	var componentType = reflect.TypeFor[T]().String()
-	l := componentLinkManager.(*linkManager)
-
-	if id, ok := l.linkedComponents[componentType]; ok {
-		componentId = id
-	} else {
-		componentId = l.componentIdCursor
-		l.linkedComponents[componentType] = l.componentIdCursor
-		l.componentLinkers.Set(
-			l.componentIdCursor,
-			newLinker[T](l.defaultLinkerSize, l.poolCapacity, l.componentIdCursor, componentType, l.entityLinker, l.Set),
-		)
-		l.componentIdCursor++
-	}
-
-	return l.componentLinkers.Get(componentId)
 }

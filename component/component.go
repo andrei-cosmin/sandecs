@@ -22,3 +22,10 @@ type Linker[T Component] interface {
 	Unlink(entity entity.Id)
 	ComponentId() Id
 }
+
+type TagLinker interface {
+	Link(entity entity.Id) bool
+	Has(entity entity.Id) bool
+	Unlink(entity entity.Id)
+	ComponentId() Id
+}

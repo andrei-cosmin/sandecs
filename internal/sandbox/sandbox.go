@@ -51,14 +51,14 @@ func (s *Sandbox) Update() {
 	s.entityLinker.Refresh()
 }
 
-func (s *Sandbox) Accept(registration api.ComponentRegistration) {
+func (s *Sandbox) Accept(registration api.Registration) {
 	s.componentLinkManager.Accept(registration)
 }
 
 func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 	ruleSets := make([][]component.Id, SetSize)
 
-	for ruleSetIndex := SetStart; ruleSetIndex < SetSize; ruleSetIndex++ {
+	for ruleSetIndex := range SetSize {
 		ruleSets[ruleSetIndex] = make([]component.Id, 0)
 	}
 
@@ -67,7 +67,7 @@ func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 		ruleSets[rule.RuleType()] = append(ruleSets[rule.RuleType()], rule.ComponentId())
 	}
 
-	for ruleSetIndex := SetStart; ruleSetIndex < SetSize; ruleSetIndex++ {
+	for ruleSetIndex := range SetSize {
 		slices.Sort(ruleSets[ruleSetIndex])
 	}
 

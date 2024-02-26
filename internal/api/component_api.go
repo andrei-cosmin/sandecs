@@ -12,7 +12,7 @@ type ComponentLinkRetriever interface {
 type ComponentLinkManager interface {
 	Get(componentId component.Id) ComponentLinker
 	UpdateLinks(scheduledEntityRemoves *bitset.BitSet)
-	Accept(registration ComponentRegistration)
+	Accept(registration Registration)
 	IsClear() bool
 }
 
@@ -20,8 +20,9 @@ type ComponentLinker interface {
 	ComponentId() component.Id
 	EntityIds() *bitset.BitSet
 	Update(scheduledEntityRemoves *bitset.BitSet)
+	Refresh()
 }
 
-type ComponentRegistration interface {
+type Registration interface {
 	Execute(ctx ComponentLinkManager)
 }

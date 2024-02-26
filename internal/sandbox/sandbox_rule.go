@@ -17,29 +17,55 @@ const (
 
 type Rule interface {
 	RuleType() Type
-	Registration() api.ComponentRegistration
+	Registration() api.Registration
 	ComponentId() component.Id
 }
 
-type BasicRule[T component.Component] struct {
+type ComponentRule[T component.Component] struct {
 	ComponentRegistration[T]
 	ruleType Type
 }
 
-func NewRule[T component.Component](ruleType Type) *BasicRule[T] {
-	return &BasicRule[T]{
+func NewComponentRule[T component.Component](ruleType Type) *ComponentRule[T] {
+	return &ComponentRule[T]{
 		ruleType: ruleType,
 	}
 }
 
-func (r *BasicRule[T]) RuleType() Type {
+func (r *ComponentRule[T]) RuleType() Type {
 	return r.ruleType
 }
 
-func (r *BasicRule[T]) ComponentId() component.Id {
+func (r *ComponentRule[T]) ComponentId() component.Id {
 	return r.GetLinker().ComponentId()
 }
 
-func (r *BasicRule[T]) Registration() api.ComponentRegistration {
+func (r *ComponentRule[T]) Registration() api.Registration {
 	return &r.ComponentRegistration
+}
+
+type TagRule struct {
+	TagRegistration
+	ruleType Type
+}
+
+func NewTagRule(tag component.Tag, ruleType Type) *TagRule {
+	return &TagRule{
+		TagRegistration: TagRegistration{
+			tag: tag,
+		},
+		ruleType: ruleType,
+	}
+}
+
+func (r *TagRule) RuleType() Type {
+	return r.ruleType
+}
+
+func (r *TagRule) ComponentId() component.Id {
+	return r.GetLinker().ComponentId()
+}
+
+func (r *TagRule) Registration() api.Registration {
+	return &r.TagRegistration
 }
