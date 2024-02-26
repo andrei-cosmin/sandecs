@@ -51,6 +51,12 @@ func ComponentLinker[T component.Component](s *Sandbox) component.Linker[T] {
 	return registration.GetLinker()
 }
 
+func TagLinker(s *Sandbox, tag component.Tag) component.TagLinker {
+	registration := sandbox.NewTagRegistration(tag)
+	s.internal.Accept(registration)
+	return registration.GetLinker()
+}
+
 func Update(s *Sandbox) {
 	if s.internal.IsUpdated() {
 		return

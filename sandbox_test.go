@@ -43,81 +43,81 @@ func (suite *SandboxTestSuite) SetupTest() {
 }
 
 func (suite *SandboxTestSuite) TestLinkingEntity() {
-	for i := 0; i < numEntities; i++ {
+	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities; i++ {
-		suite.assertEntity(entity.Id(i), entityNotLinkedMsg, i)
+	for index := range numEntities {
+		suite.assertEntity(entity.Id(index), entityNotLinkedMsg, index)
 	}
 }
 
 func (suite *SandboxTestSuite) TestUnlinkingEntity() {
-	for i := 0; i < numEntities; i++ {
+	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities/2; i++ {
-		UnlinkEntity(suite.sandbox, entity.Id(i))
+	for index := range numEntities / 2 {
+		UnlinkEntity(suite.sandbox, entity.Id(index))
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities/2; i++ {
-		suite.assertDeletedEntity(entity.Id(i), entityNotUnlinkedMsg, i)
+	for index := range numEntities / 2 {
+		suite.assertDeletedEntity(entity.Id(index), entityNotUnlinkedMsg, index)
 	}
-	for i := numEntities / 2; i < numEntities; i++ {
-		suite.assertEntity(entity.Id(i), entityNotLinkedMsg, i)
+	for index := numEntities / 2; index < numEntities; index++ {
+		suite.assertEntity(entity.Id(index), entityNotLinkedMsg, index)
 	}
 }
 
 func (suite *SandboxTestSuite) TestDuplicateUnlinkingEntity() {
-	for i := 0; i < numEntities; i++ {
+	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities/2; i++ {
-		UnlinkEntity(suite.sandbox, entity.Id(i))
+	for index := range numEntities / 2 {
+		UnlinkEntity(suite.sandbox, entity.Id(index))
 	}
-	for i := 0; i < numEntities/2; i++ {
-		UnlinkEntity(suite.sandbox, entity.Id(i))
+	for index := range numEntities / 2 {
+		UnlinkEntity(suite.sandbox, entity.Id(index))
 	}
-	for i := 0; i < numEntities/2; i++ {
-		suite.assertEntity(entity.Id(i), entityNotLinkedMsg, i)
+	for index := range numEntities / 2 {
+		suite.assertEntity(entity.Id(index), entityNotLinkedMsg, index)
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities/2; i++ {
-		UnlinkEntity(suite.sandbox, entity.Id(i))
+	for index := range numEntities / 2 {
+		UnlinkEntity(suite.sandbox, entity.Id(index))
 	}
-	for i := 0; i < numEntities/2; i++ {
-		suite.assertDeletedEntity(entity.Id(i), entityNotUnlinkedMsg, i)
+	for index := range numEntities / 2 {
+		suite.assertDeletedEntity(entity.Id(index), entityNotUnlinkedMsg, index)
 	}
 }
 
 func (suite *SandboxTestSuite) TestEntityRecycling() {
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		entityId := LinkEntity(suite.sandbox)
-		assert.Equal(suite.T(), entity.Id(i), entityId, entityLinkedOrderMsg, i)
-		suite.assertEntity(entity.Id(i), entityNotLinkedMsg, i)
-		UnlinkEntity(suite.sandbox, entity.Id(i))
-		suite.assertEntity(entity.Id(i), entityUnlinkedBeforeUpdateMsg, i)
+		assert.Equal(suite.T(), entity.Id(index), entityId, entityLinkedOrderMsg, index)
+		suite.assertEntity(entity.Id(index), entityNotLinkedMsg, index)
+		UnlinkEntity(suite.sandbox, entity.Id(index))
+		suite.assertEntity(entity.Id(index), entityUnlinkedBeforeUpdateMsg, index)
 	}
 
 	Update(suite.sandbox)
 
-	for i := 0; i < numEntities; i++ {
-		suite.assertDeletedEntity(entity.Id(i), entityNotUnlinkedMsg, i)
+	for index := range numEntities {
+		suite.assertDeletedEntity(entity.Id(index), entityNotUnlinkedMsg, index)
 	}
 
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		entityId := LinkEntity(suite.sandbox)
-		assert.Equal(suite.T(), entity.Id(i), entityId, entityNotRecycledMsg, i)
-		suite.assertEntity(entity.Id(i), entityNotLinkedMsg, i)
+		assert.Equal(suite.T(), entity.Id(index), entityId, entityNotRecycledMsg, index)
+		suite.assertEntity(entity.Id(index), entityNotLinkedMsg, index)
 	}
 }
 
 func (suite *SandboxTestSuite) TestEntityRecyclingRandom() {
 	randomEntityIds := getRandomIds(numEntities, numRemoves)
 
-	for i := 0; i < numEntities; i++ {
+	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
 	for _, entityId := range randomEntityIds {
@@ -133,17 +133,17 @@ func (suite *SandboxTestSuite) TestEntityRecyclingRandom() {
 }
 
 func (suite *SandboxTestSuite) TestSimpleLinkingComponents() {
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i)).X = float64(i)
-		suite.assertComponent(suite.positionLinker, entity.Id(i), componentValueMsg, positionComponent, i)
+		suite.positionLinker.Link(entity.Id(index)).X = float64(index)
+		suite.assertComponent(suite.positionLinker, entity.Id(index), componentValueMsg, positionComponent, index)
 	}
 
 	Update(suite.sandbox)
 
-	for i := 0; i < numEntities; i++ {
-		suite.assertComponent(suite.positionLinker, entity.Id(i), componentNotLinkedMsg, positionComponent, i)
-		assert.Equal(suite.T(), float64(i), suite.positionLinker.Get(entity.Id(i)).X, componentValueMsg, positionComponent, i)
+	for index := range numEntities {
+		suite.assertComponent(suite.positionLinker, entity.Id(index), componentNotLinkedMsg, positionComponent, index)
+		assert.Equal(suite.T(), float64(index), suite.positionLinker.Get(entity.Id(index)).X, componentValueMsg, positionComponent, index)
 	}
 }
 
@@ -185,42 +185,42 @@ func (suite *SandboxTestSuite) TestComponentForInvalidEntity() {
 }
 
 func (suite *SandboxTestSuite) TestHeavyLinkingComponents() {
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i)).X = float64(i)
-		suite.assertComponent(suite.positionLinker, entity.Id(i), componentNotLinkedMsg, positionComponent, i)
+		suite.positionLinker.Link(entity.Id(index)).X = float64(index)
+		suite.assertComponent(suite.positionLinker, entity.Id(index), componentNotLinkedMsg, positionComponent, index)
 	}
-	for i := 0; i < numEntities/2; i++ {
-		suite.velocityLinker.Link(entity.Id(i)).Y = float64(i * 2)
-		suite.assertComponent(suite.velocityLinker, entity.Id(i), componentNotLinkedMsg, velocityComponent, i)
+	for index := range numEntities / 2 {
+		suite.velocityLinker.Link(entity.Id(index)).Y = float64(index * 2)
+		suite.assertComponent(suite.velocityLinker, entity.Id(index), componentNotLinkedMsg, velocityComponent, index)
 	}
-	for i := numEntities / 2; i < numEntities; i++ {
-		suite.healthLinker.Link(entity.Id(i)).value = float64(i / 2)
-		suite.assertComponent(suite.healthLinker, entity.Id(i), componentNotLinkedMsg, healthComponent, i)
+	for index := numEntities / 2; index < numEntities; index++ {
+		suite.healthLinker.Link(entity.Id(index)).value = float64(index / 2)
+		suite.assertComponent(suite.healthLinker, entity.Id(index), componentNotLinkedMsg, healthComponent, index)
 	}
-	for i := numEntities / 4; i < numEntities*3/4; i++ {
-		suite.armorLinker.Link(entity.Id(i)).value = i / 10
-		suite.assertComponent(suite.armorLinker, entity.Id(i), componentNotLinkedMsg, armorComponent, i, i)
+	for index := numEntities / 4; index < numEntities*3/4; index++ {
+		suite.armorLinker.Link(entity.Id(index)).value = index / 10
+		suite.assertComponent(suite.armorLinker, entity.Id(index), componentNotLinkedMsg, armorComponent, index, index)
 	}
 
 	Update(suite.sandbox)
 
-	for i := 0; i < numEntities; i++ {
-		suite.assertComponent(suite.positionLinker, entity.Id(i), componentNotLinkedMsg, positionComponent, i)
-		assert.Equal(suite.T(), float64(i), suite.positionLinker.Get(entity.Id(i)).X, componentValueMsg, positionComponent, i)
+	for index := range numEntities {
+		suite.assertComponent(suite.positionLinker, entity.Id(index), componentNotLinkedMsg, positionComponent, index)
+		assert.Equal(suite.T(), float64(index), suite.positionLinker.Get(entity.Id(index)).X, componentValueMsg, positionComponent, index)
 	}
-	for i := 0; i < numEntities/2; i++ {
-		suite.assertComponent(suite.velocityLinker, entity.Id(i), componentNotLinkedMsg, velocityComponent, i)
-		assert.Equal(suite.T(), float64(i*2), suite.velocityLinker.Get(entity.Id(i)).Y, componentValueMsg, velocityComponent, i)
+	for index := range numEntities / 2 {
+		suite.assertComponent(suite.velocityLinker, entity.Id(index), componentNotLinkedMsg, velocityComponent, index)
+		assert.Equal(suite.T(), float64(index*2), suite.velocityLinker.Get(entity.Id(index)).Y, componentValueMsg, velocityComponent, index)
 	}
-	for i := numEntities / 2; i < numEntities; i++ {
-		suite.assertComponent(suite.healthLinker, entity.Id(i), componentNotLinkedMsg, healthComponent, i)
-		assert.Equal(suite.T(), float64(i/2), suite.healthLinker.Get(entity.Id(i)).value, componentValueMsg, healthComponent, i)
+	for index := numEntities / 2; index < numEntities; index++ {
+		suite.assertComponent(suite.healthLinker, entity.Id(index), componentNotLinkedMsg, healthComponent, index)
+		assert.Equal(suite.T(), float64(index/2), suite.healthLinker.Get(entity.Id(index)).value, componentValueMsg, healthComponent, index)
 
 	}
-	for i := numEntities / 4; i < numEntities*3/4; i++ {
-		suite.assertComponent(suite.armorLinker, entity.Id(i), componentNotLinkedMsg, armorComponent, i, i)
-		assert.Equal(suite.T(), i/10, suite.armorLinker.Get(entity.Id(i)).value, componentValueMsg, armorComponent, i)
+	for index := numEntities / 4; index < numEntities*3/4; index++ {
+		suite.assertComponent(suite.armorLinker, entity.Id(index), componentNotLinkedMsg, armorComponent, index, index)
+		assert.Equal(suite.T(), index/10, suite.armorLinker.Get(entity.Id(index)).value, componentValueMsg, armorComponent, index)
 	}
 }
 
@@ -228,9 +228,9 @@ func (suite *SandboxTestSuite) TestSimpleUnlinkingComponents() {
 	removedEntityId := entity.Id(rand.IntN(numEntities))
 	removedComponentEntityId := entity.Id(rand.IntN(numEntities))
 
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
+		suite.positionLinker.Link(entity.Id(index))
 	}
 
 	UnlinkEntity(suite.sandbox, removedEntityId)
@@ -246,26 +246,26 @@ func (suite *SandboxTestSuite) TestSimpleUnlinkingComponents() {
 	assert.Equal(suite.T(), removedEntityId, readdedEntityId, entityRecycleOrderMsg, readdedEntityId)
 	suite.assertDeletedComponent(suite.positionLinker, readdedEntityId, componentNotUnlinkedMsg, positionComponent, readdedEntityId)
 
-	for i := 0; i < numEntities; i++ {
-		if i != int(removedEntityId) && i != int(removedComponentEntityId) {
-			suite.assertComponent(suite.positionLinker, entity.Id(i), componentNotLinkedMsg, positionComponent, i)
+	for index := range numEntities {
+		if index != int(removedEntityId) && index != int(removedComponentEntityId) {
+			suite.assertComponent(suite.positionLinker, entity.Id(index), componentNotLinkedMsg, positionComponent, index)
 		}
 	}
 }
 
 func (suite *SandboxTestSuite) TestHeavyUnlinkingComponents() {
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
+		suite.positionLinker.Link(entity.Id(index))
 	}
-	for i := 0; i < numEntities/2; i++ {
-		suite.velocityLinker.Link(entity.Id(i))
+	for index := range numEntities / 2 {
+		suite.velocityLinker.Link(entity.Id(index))
 	}
-	for i := numEntities / 2; i < numEntities; i++ {
-		suite.healthLinker.Link(entity.Id(i))
+	for index := numEntities / 2; index < numEntities; index++ {
+		suite.healthLinker.Link(entity.Id(index))
 	}
-	for i := numEntities / 4; i < numEntities*3/4; i++ {
-		suite.armorLinker.Link(entity.Id(i))
+	for index := numEntities / 4; index < numEntities*3/4; index++ {
+		suite.armorLinker.Link(entity.Id(index))
 	}
 
 	removedEntities := getRandomIds(numEntities, numRemoves)
@@ -313,19 +313,88 @@ func (suite *SandboxTestSuite) TestHeavyUnlinkingComponents() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestSimplePooling() {
-	for i := 0; i < numEntities; i++ {
+func (suite *SandboxTestSuite) TestHeavyTags() {
+	tagA := "A"
+	tagB := "B"
+	tagC := "C"
+	tagD := "D"
+	aHandler := TagLinker(suite.sandbox, tagA)
+	bHandler := TagLinker(suite.sandbox, tagB)
+	cHandler := TagLinker(suite.sandbox, tagC)
+	dHandler := TagLinker(suite.sandbox, tagD)
+
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
-		suite.positionLinker.Get(entity.Id(i)).X = float64(i + numEntities)
+		aHandler.Link(entity.Id(index))
+	}
+	for index := range numEntities / 2 {
+		bHandler.Link(entity.Id(index))
+	}
+	for index := numEntities / 2; index < numEntities; index++ {
+		cHandler.Link(entity.Id(index))
+	}
+	for index := numEntities / 4; index < numEntities*3/4; index++ {
+		dHandler.Link(entity.Id(index))
+	}
+
+	removedEntities := getRandomIds(numEntities, numRemoves)
+	removedA := getRandomIds(numEntities, numRemoves)
+	removedB := getRandomIds(numEntities/2, numRemoves)
+	removedC := getRandomIds(numEntities/4, numRemoves)
+	removedD := getRandomIds(numEntities/3, numRemoves)
+
+	for _, entityId := range removedEntities {
+		UnlinkEntity(suite.sandbox, entityId)
+	}
+	for _, entityId := range removedA {
+		aHandler.Unlink(entityId)
+	}
+	for _, entityId := range removedB {
+		bHandler.Unlink(entityId)
+	}
+	for _, entityId := range removedC {
+		cHandler.Unlink(entityId)
+	}
+	for _, entityId := range removedD {
+		dHandler.Unlink(entityId)
+	}
+
+	Update(suite.sandbox)
+
+	for _, entityId := range removedEntities {
+		suite.assertDeletedEntity(entityId, entityNotUnlinkedMsg, entityId)
+		suite.assertDeletedComponent(aHandler, entityId, componentNotUnlinkedMsg, tagA, entityId)
+		suite.assertDeletedComponent(bHandler, entityId, componentNotUnlinkedMsg, tagB, entityId)
+		suite.assertDeletedComponent(cHandler, entityId, componentNotUnlinkedMsg, tagC, entityId)
+		suite.assertDeletedComponent(dHandler, entityId, componentNotUnlinkedMsg, tagD, entityId)
+	}
+	for _, entityId := range removedA {
+		suite.assertDeletedComponent(aHandler, entityId, componentNotUnlinkedMsg, tagA, entityId)
+	}
+	for _, entityId := range removedB {
+		suite.assertDeletedComponent(bHandler, entityId, componentNotUnlinkedMsg, tagB, entityId)
+	}
+	for _, entityId := range removedC {
+		suite.assertDeletedComponent(cHandler, entityId, componentNotUnlinkedMsg, tagC, entityId)
+	}
+	for _, entityId := range removedD {
+		suite.assertDeletedComponent(dHandler, entityId, componentNotUnlinkedMsg, tagD, entityId)
+	}
+}
+
+func (suite *SandboxTestSuite) TestSimplePooling() {
+	for index := range numEntities {
+		LinkEntity(suite.sandbox)
+		suite.positionLinker.Link(entity.Id(index))
+		suite.positionLinker.Get(entity.Id(index)).X = float64(index + numEntities)
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities; i++ {
-		suite.positionLinker.Unlink(entity.Id(i))
+	for index := range numEntities {
+		suite.positionLinker.Unlink(entity.Id(index))
 	}
 	Update(suite.sandbox)
-	for i := 0; i < numEntities; i++ {
-		suite.positionLinker.Link(entity.Id(i))
+	for index := range numEntities {
+		suite.positionLinker.Link(entity.Id(index))
 	}
 	Update(suite.sandbox)
 
@@ -333,8 +402,8 @@ func (suite *SandboxTestSuite) TestSimplePooling() {
 	if suite.pooling {
 		poolSize = DefaultPoolCapacity
 	}
-	for i := 0; i < poolSize; i++ {
-		assert.NotEqual(suite.T(), float64(0), suite.positionLinker.Get(entity.Id(i)).X, componentValueMsg, positionComponent, i)
+	for index := range poolSize {
+		assert.NotEqual(suite.T(), float64(0), suite.positionLinker.Get(entity.Id(index)).X, componentValueMsg, positionComponent, index)
 	}
 	for i := poolSize; i < numEntities; i++ {
 		assert.Equal(suite.T(), float64(0), suite.positionLinker.Get(entity.Id(i)).X, componentValueMsg, positionComponent, i)
@@ -349,9 +418,9 @@ func (suite *SandboxTestSuite) TestSimpleFilter() {
 	Filter(suite.sandbox, filter.Match[position]())
 
 	assert.Len(suite.T(), positionFilter.EntityIds(), 0, filterIncorrectNumEntitiesMsg)
-	for i := 0; i < numEntities; i++ {
+	for index := range numEntities {
 		LinkEntity(suite.sandbox)
-		suite.positionLinker.Link(entity.Id(i))
+		suite.positionLinker.Link(entity.Id(index))
 	}
 	assert.Len(suite.T(), positionFilter.EntityIds(), 0, filterIncorrectNumEntitiesMsg)
 	Update(suite.sandbox)
@@ -359,27 +428,30 @@ func (suite *SandboxTestSuite) TestSimpleFilter() {
 }
 
 func (suite *SandboxTestSuite) TestHeavyFilter() {
-	filter1 := Filter(suite.sandbox, filter.Match2[position, velocity](), filter.Exclude[armor]())
-	filter2 := Filter(suite.sandbox, filter.Match3[position, velocity, armor]())
-	filter3 := Filter(suite.sandbox, filter.Union2[velocity, armor]())
-	filter4 := Filter(suite.sandbox, filter.Union3[velocity, armor, position]())
+	armorHandler := TagLinker(suite.sandbox, armorComponent)
+	filter1 := Filter(suite.sandbox, filter.Match2[position, velocity](), filter.ExcludeTags(armorComponent))
+	filter2 := Filter(suite.sandbox, filter.Match2[position, velocity](), filter.MatchTags(armorComponent))
+	filter3 := Filter(suite.sandbox, filter.Union[velocity](), filter.UnionTags(armorComponent))
+	filter4 := Filter(suite.sandbox, filter.Union2[velocity, position](), filter.UnionTags(armorComponent))
 
 	filterCount1 := 0
 	filterCount2 := 0
 	filterCount3 := 0
 	filterCount4 := 0
 
-	for i := 0; i < numEntities; i++ {
+	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
-	for i := 0; i < numEntities/5; i++ {
-		suite.positionLinker.Link(entity.Id(i))
+	addedPositionCount := numEntities / 5
+	for index := range addedPositionCount {
+		suite.positionLinker.Link(entity.Id(index))
 	}
-	for i := numEntities / 4; i < numEntities*3/4; i++ {
-		suite.velocityLinker.Link(entity.Id(i))
+	addedVelocityCount := numEntities - numEntities/4
+	for index := numEntities / 4; index < numEntities*3/4; index++ {
+		suite.velocityLinker.Link(entity.Id(index))
 	}
-	for i := numEntities / 2; i < numEntities; i++ {
-		suite.armorLinker.Link(entity.Id(i))
+	for index := numEntities / 2; index < numEntities; index++ {
+		armorHandler.Link(entity.Id(index))
 	}
 
 	assert.Len(suite.T(), filter1.EntityIds(), filterCount1, filterIncorrectNumEntitiesMsg)
@@ -389,34 +461,36 @@ func (suite *SandboxTestSuite) TestHeavyFilter() {
 
 	Update(suite.sandbox)
 
-	filterCount3 += numEntities - numEntities/4
-	filterCount4 += numEntities - numEntities/4 + numEntities/5
+	filterCount3 += addedVelocityCount
+	filterCount4 += addedVelocityCount + addedPositionCount
 
 	assert.Len(suite.T(), filter1.EntityIds(), filterCount1, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter2.EntityIds(), filterCount2, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter3.EntityIds(), filterCount3, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter4.EntityIds(), filterCount4, filterIncorrectNumEntitiesMsg)
 
-	for i := 0; i < numEntities/10; i++ {
-		suite.velocityLinker.Link(entity.Id(i))
+	addedVelocityCount = numEntities / 10
+	for index := range addedVelocityCount {
+		suite.velocityLinker.Link(entity.Id(index))
 	}
 	Update(suite.sandbox)
 
-	filterCount1 += numEntities / 10
-	filterCount3 += numEntities / 10
+	filterCount1 += addedVelocityCount
+	filterCount3 += addedVelocityCount
 
 	assert.Len(suite.T(), filter1.EntityIds(), filterCount1, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter2.EntityIds(), filterCount2, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter3.EntityIds(), filterCount3, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter4.EntityIds(), filterCount4, filterIncorrectNumEntitiesMsg)
 
-	for i := 0; i < numEntities/14; i++ {
-		suite.armorLinker.Link(entity.Id(i))
+	addedArmorCount := numEntities / 14
+	for index := range addedArmorCount {
+		armorHandler.Link(entity.Id(index))
 	}
 	Update(suite.sandbox)
 
-	filterCount1 -= numEntities / 14
-	filterCount2 += numEntities / 14
+	filterCount1 -= addedArmorCount
+	filterCount2 += addedArmorCount
 
 	assert.Len(suite.T(), filter1.EntityIds(), filterCount1, filterIncorrectNumEntitiesMsg)
 	assert.Len(suite.T(), filter2.EntityIds(), filterCount2, filterIncorrectNumEntitiesMsg)

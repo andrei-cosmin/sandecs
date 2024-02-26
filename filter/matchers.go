@@ -9,10 +9,32 @@ type Filter struct {
 	Rules []sandbox.Rule
 }
 
+func createTagRules(ruleType sandbox.Type, tags ...component.Tag) Filter {
+	rules := make([]sandbox.Rule, len(tags))
+	for index, tag := range tags {
+		rules[index] = sandbox.NewTagRule(tag, ruleType)
+	}
+	return Filter{
+		Rules: rules,
+	}
+}
+
+func MatchTags(tags ...component.Tag) Filter {
+	return createTagRules(sandbox.Match, tags...)
+}
+
+func ExcludeTags(tags ...component.Tag) Filter {
+	return createTagRules(sandbox.Exclude, tags...)
+}
+
+func UnionTags(tags ...component.Tag) Filter {
+	return createTagRules(sandbox.Union, tags...)
+}
+
 func Match[T component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[T](sandbox.Match),
+			sandbox.NewComponentRule[T](sandbox.Match),
 		},
 	}
 }
@@ -20,8 +42,8 @@ func Match[T component.Component]() Filter {
 func Match2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Match),
-			sandbox.NewRule[B](sandbox.Match),
+			sandbox.NewComponentRule[A](sandbox.Match),
+			sandbox.NewComponentRule[B](sandbox.Match),
 		},
 	}
 }
@@ -29,9 +51,9 @@ func Match2[A, B component.Component]() Filter {
 func Match3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Match),
-			sandbox.NewRule[B](sandbox.Match),
-			sandbox.NewRule[C](sandbox.Match),
+			sandbox.NewComponentRule[A](sandbox.Match),
+			sandbox.NewComponentRule[B](sandbox.Match),
+			sandbox.NewComponentRule[C](sandbox.Match),
 		},
 	}
 }
@@ -39,10 +61,10 @@ func Match3[A, B, C component.Component]() Filter {
 func Match4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Match),
-			sandbox.NewRule[B](sandbox.Match),
-			sandbox.NewRule[C](sandbox.Match),
-			sandbox.NewRule[D](sandbox.Match),
+			sandbox.NewComponentRule[A](sandbox.Match),
+			sandbox.NewComponentRule[B](sandbox.Match),
+			sandbox.NewComponentRule[C](sandbox.Match),
+			sandbox.NewComponentRule[D](sandbox.Match),
 		},
 	}
 }
@@ -50,11 +72,11 @@ func Match4[A, B, C, D component.Component]() Filter {
 func Match5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Match),
-			sandbox.NewRule[B](sandbox.Match),
-			sandbox.NewRule[C](sandbox.Match),
-			sandbox.NewRule[D](sandbox.Match),
-			sandbox.NewRule[E](sandbox.Match),
+			sandbox.NewComponentRule[A](sandbox.Match),
+			sandbox.NewComponentRule[B](sandbox.Match),
+			sandbox.NewComponentRule[C](sandbox.Match),
+			sandbox.NewComponentRule[D](sandbox.Match),
+			sandbox.NewComponentRule[E](sandbox.Match),
 		},
 	}
 }
@@ -62,7 +84,7 @@ func Match5[A, B, C, D, E component.Component]() Filter {
 func Exclude[T component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[T](sandbox.Exclude),
+			sandbox.NewComponentRule[T](sandbox.Exclude),
 		},
 	}
 }
@@ -70,8 +92,8 @@ func Exclude[T component.Component]() Filter {
 func Exclude2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Exclude),
-			sandbox.NewRule[B](sandbox.Exclude),
+			sandbox.NewComponentRule[A](sandbox.Exclude),
+			sandbox.NewComponentRule[B](sandbox.Exclude),
 		},
 	}
 }
@@ -79,9 +101,9 @@ func Exclude2[A, B component.Component]() Filter {
 func Exclude3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Exclude),
-			sandbox.NewRule[B](sandbox.Exclude),
-			sandbox.NewRule[C](sandbox.Exclude),
+			sandbox.NewComponentRule[A](sandbox.Exclude),
+			sandbox.NewComponentRule[B](sandbox.Exclude),
+			sandbox.NewComponentRule[C](sandbox.Exclude),
 		},
 	}
 }
@@ -89,10 +111,10 @@ func Exclude3[A, B, C component.Component]() Filter {
 func Exclude4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Exclude),
-			sandbox.NewRule[B](sandbox.Exclude),
-			sandbox.NewRule[C](sandbox.Exclude),
-			sandbox.NewRule[D](sandbox.Exclude),
+			sandbox.NewComponentRule[A](sandbox.Exclude),
+			sandbox.NewComponentRule[B](sandbox.Exclude),
+			sandbox.NewComponentRule[C](sandbox.Exclude),
+			sandbox.NewComponentRule[D](sandbox.Exclude),
 		},
 	}
 }
@@ -100,11 +122,19 @@ func Exclude4[A, B, C, D component.Component]() Filter {
 func Exclude5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Exclude),
-			sandbox.NewRule[B](sandbox.Exclude),
-			sandbox.NewRule[C](sandbox.Exclude),
-			sandbox.NewRule[D](sandbox.Exclude),
-			sandbox.NewRule[E](sandbox.Exclude),
+			sandbox.NewComponentRule[A](sandbox.Exclude),
+			sandbox.NewComponentRule[B](sandbox.Exclude),
+			sandbox.NewComponentRule[C](sandbox.Exclude),
+			sandbox.NewComponentRule[D](sandbox.Exclude),
+			sandbox.NewComponentRule[E](sandbox.Exclude),
+		},
+	}
+}
+
+func Union[A component.Component]() Filter {
+	return Filter{
+		Rules: []sandbox.Rule{
+			sandbox.NewComponentRule[A](sandbox.Union),
 		},
 	}
 }
@@ -112,8 +142,8 @@ func Exclude5[A, B, C, D, E component.Component]() Filter {
 func Union2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Union),
-			sandbox.NewRule[B](sandbox.Union),
+			sandbox.NewComponentRule[A](sandbox.Union),
+			sandbox.NewComponentRule[B](sandbox.Union),
 		},
 	}
 }
@@ -121,9 +151,9 @@ func Union2[A, B component.Component]() Filter {
 func Union3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Union),
-			sandbox.NewRule[B](sandbox.Union),
-			sandbox.NewRule[C](sandbox.Union),
+			sandbox.NewComponentRule[A](sandbox.Union),
+			sandbox.NewComponentRule[B](sandbox.Union),
+			sandbox.NewComponentRule[C](sandbox.Union),
 		},
 	}
 }
@@ -131,10 +161,10 @@ func Union3[A, B, C component.Component]() Filter {
 func Union4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Union),
-			sandbox.NewRule[B](sandbox.Union),
-			sandbox.NewRule[C](sandbox.Union),
-			sandbox.NewRule[D](sandbox.Union),
+			sandbox.NewComponentRule[A](sandbox.Union),
+			sandbox.NewComponentRule[B](sandbox.Union),
+			sandbox.NewComponentRule[C](sandbox.Union),
+			sandbox.NewComponentRule[D](sandbox.Union),
 		},
 	}
 }
@@ -142,11 +172,11 @@ func Union4[A, B, C, D component.Component]() Filter {
 func Union5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
-			sandbox.NewRule[A](sandbox.Union),
-			sandbox.NewRule[B](sandbox.Union),
-			sandbox.NewRule[C](sandbox.Union),
-			sandbox.NewRule[D](sandbox.Union),
-			sandbox.NewRule[E](sandbox.Union),
+			sandbox.NewComponentRule[A](sandbox.Union),
+			sandbox.NewComponentRule[B](sandbox.Union),
+			sandbox.NewComponentRule[C](sandbox.Union),
+			sandbox.NewComponentRule[D](sandbox.Union),
+			sandbox.NewComponentRule[E](sandbox.Union),
 		},
 	}
 }
