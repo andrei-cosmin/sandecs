@@ -155,7 +155,7 @@ func (suite *SandboxTestSuite) TestDuplicateLinkingComponent() {
 	suite.assertComponent(suite.positionLinker, entityId, componentNotLinkedMsg, positionComponent, entityId)
 
 	suite.positionLinker.Get(entityId).X = xValue
-	suite.positionLinker.Link(entityId)
+	assert.Nil(suite.T(), suite.positionLinker.Link(entityId))
 	assert.Equal(suite.T(), xValue, suite.positionLinker.Get(entityId).X, componentValueMsg, positionComponent, entityId)
 }
 
