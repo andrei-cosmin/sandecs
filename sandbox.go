@@ -36,7 +36,7 @@ func NewDefault() *Sandbox {
 // Filter method - creates a view of the entities that pass the given filters
 //
 // WARNING: it is strongly recommended that all filters be registered at the beginning of the application's lifetime (in the initialization phase)
-func Filter(s *Sandbox, filters ...filter.Filter) entity.View {
+func Filter(s *Sandbox, filters ...filter.Filter) entity.SliceView {
 	rules := make([]sandbox.Rule, 0)
 	for index := range filters {
 		rules = append(rules, filters[index].Rules...)

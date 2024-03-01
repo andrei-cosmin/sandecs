@@ -12,7 +12,7 @@ const (
 	numEdits            = 1000
 )
 
-func BenchmarkSandIter(b *testing.B) {
+func Benchmark_Iter(b *testing.B) {
 	b.StopTimer()
 	sandbox := NewDefault()
 	positionHandler := ComponentLinker[position](sandbox)
@@ -43,7 +43,7 @@ func BenchmarkSandIter(b *testing.B) {
 	}
 }
 
-func BenchmarkSandLinkUnlinkComponent(b *testing.B) {
+func Benchmark_UpdateComponents(b *testing.B) {
 	b.StopTimer()
 	sandbox := New(numPosition+numPositionVelocity, 4, 20000)
 	positionHandler := ComponentLinker[position](sandbox)
@@ -78,7 +78,7 @@ func BenchmarkSandLinkUnlinkComponent(b *testing.B) {
 	}
 }
 
-func BenchmarkSandLinkUnlinkEntity(b *testing.B) {
+func Benchmark_UpdateEntities(b *testing.B) {
 	b.StopTimer()
 	sandbox := New(numPosition+numPositionVelocity, 4, 20000)
 	positionHandler := ComponentLinker[position](sandbox)

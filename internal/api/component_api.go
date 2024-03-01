@@ -13,7 +13,7 @@ type ComponentLinkRetriever interface {
 // ComponentLinkManager interface - manager for component linkers
 type ComponentLinkManager interface {
 	Get(componentId component.Id) ComponentLinker
-	UpdateLinks(scheduledEntityRemoves *bitset.BitSet)
+	UpdateLinks(scheduledSandboxRemoves *bitset.BitSet)
 	Accept(registration Registration)
 	IsClear() bool
 }
@@ -22,7 +22,8 @@ type ComponentLinkManager interface {
 type ComponentLinker interface {
 	ComponentId() component.Id
 	EntityIds() *bitset.BitSet
-	Update(scheduledEntityRemoves *bitset.BitSet)
+	CleanScheduledEntities(scheduledSandboxRemoves *bitset.BitSet)
+	CleanScheduledInstances()
 	Refresh()
 }
 

@@ -11,7 +11,7 @@ import (
 //   - componentId component.Id - the id of the component type
 //   - componentType string - the type of the component
 //   - entityLinker api.EntityContainer - an entity container (used to retrieve which entities exist in the world at a given time)
-//   - callback func() - a function to call when the linker needs to be updated (will mark the link manager for update)
+//   - callback func() - this callback will mark the link manager for update (will be executed when changes in  entities / instances are performed)
 //   - scheduledRemoves *bitset.Bitset - a bitset storing the entities that are scheduled for removal from the component type
 //   - linkedEntities *bitset.Bitset - a bitset storing the entities that are linked with the component type
 type linker struct {
@@ -86,18 +86,25 @@ func (r *linker) EntityIds() *bitset.BitSet {
 	return r.linkedEntities
 }
 
-// Update method - updates the linked entities
-func (r *linker) Update(scheduledEntityRemoves *bitset.BitSet) {
+// CleanScheduledEntities  method - updates the linked entities (bitsets)
+func (r *linker) CleanScheduledEntities(scheduledSandboxRemoves *bitset.BitSet) {
 	// Perform logical OR (Union) between:
 	// - the scheduled entity removes of the world
 	// - the scheduled entity removes of the component
-	r.scheduledRemoves.InPlaceUnion(scheduledEntityRemoves)
+	r.scheduledRemoves.InPlaceUnion(scheduledSandboxRemoves)
 
 	// Perform logical difference between:
 	// - the linked entities of the component
 	// - the total scheduled entity removes (world + component)
 	// NOTE: This will clear all the bits that are scheduled for removal
 	r.linkedEntities.InPlaceDifference(r.scheduledRemoves)
+}
+
+// CleanScheduledInstances method - clears the instances corresponding to the scheduled entity removals
+//
+// NOTE: In the case of the tag linker, it will only call the listener OnRemove hook
+func (r *linker) CleanScheduledInstances() {
+	// No-op
 }
 
 // Refresh method - clears the scheduled removals

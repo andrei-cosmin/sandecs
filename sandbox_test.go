@@ -42,7 +42,7 @@ func (suite *SandboxTestSuite) SetupTest() {
 	suite.nameLinker = ComponentLinker[name](suite.sandbox)
 }
 
-func (suite *SandboxTestSuite) TestLinkingEntity() {
+func (suite *SandboxTestSuite) TestSandbox_LinkingEntity() {
 	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
@@ -52,7 +52,7 @@ func (suite *SandboxTestSuite) TestLinkingEntity() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestUnlinkingEntity() {
+func (suite *SandboxTestSuite) TestSandbox_UnlinkingEntity() {
 	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
@@ -69,7 +69,7 @@ func (suite *SandboxTestSuite) TestUnlinkingEntity() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestDuplicateUnlinkingEntity() {
+func (suite *SandboxTestSuite) TestSandbox_DuplicateUnlinkingEntity() {
 	for range numEntities {
 		LinkEntity(suite.sandbox)
 	}
@@ -92,7 +92,7 @@ func (suite *SandboxTestSuite) TestDuplicateUnlinkingEntity() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestEntityRecycling() {
+func (suite *SandboxTestSuite) TestSandbox_EntityRecycling() {
 	for index := range numEntities {
 		entityId := LinkEntity(suite.sandbox)
 		assert.Equal(suite.T(), entity.Id(index), entityId, entityLinkedOrderMsg, index)
@@ -114,7 +114,7 @@ func (suite *SandboxTestSuite) TestEntityRecycling() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestEntityRecyclingRandom() {
+func (suite *SandboxTestSuite) TestSandbox_EntityRecyclingRandom() {
 	randomEntityIds := getRandomIds(numEntities, numRemoves)
 
 	for range numEntities {
@@ -132,7 +132,7 @@ func (suite *SandboxTestSuite) TestEntityRecyclingRandom() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestSimpleLinkingComponents() {
+func (suite *SandboxTestSuite) TestSandbox_SimpleLinkingComponents() {
 	for index := range numEntities {
 		LinkEntity(suite.sandbox)
 		suite.positionLinker.Link(entity.Id(index)).X = float64(index)
@@ -147,7 +147,7 @@ func (suite *SandboxTestSuite) TestSimpleLinkingComponents() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestDuplicateLinkingComponent() {
+func (suite *SandboxTestSuite) TestSandbox_DuplicateLinkingComponent() {
 	entityId := LinkEntity(suite.sandbox)
 	xValue := 100.5
 
@@ -159,7 +159,7 @@ func (suite *SandboxTestSuite) TestDuplicateLinkingComponent() {
 	assert.Equal(suite.T(), xValue, suite.positionLinker.Get(entityId).X, componentValueMsg, positionComponent, entityId)
 }
 
-func (suite *SandboxTestSuite) TestDuplicateUnlinkingComponent() {
+func (suite *SandboxTestSuite) TestSandbox_DuplicateUnlinkingComponent() {
 	entityId := LinkEntity(suite.sandbox)
 	suite.positionLinker.Link(entityId)
 	suite.assertComponent(suite.positionLinker, entityId, componentNotLinkedMsg, positionComponent, entityId)
@@ -176,7 +176,7 @@ func (suite *SandboxTestSuite) TestDuplicateUnlinkingComponent() {
 	suite.assertDeletedComponent(suite.positionLinker, entityId, componentNotUnlinkedMsg, positionComponent, entityId)
 }
 
-func (suite *SandboxTestSuite) TestComponentForInvalidEntity() {
+func (suite *SandboxTestSuite) TestSandbox_ComponentForInvalidEntity() {
 	suite.positionLinker.Link(10 * numEntities)
 	suite.assertDeletedComponent(suite.positionLinker, 10*numEntities, componentNotUnlinkedMsg, positionComponent, 10*numEntities)
 	suite.positionLinker.Unlink(10 * numEntities)
@@ -184,7 +184,7 @@ func (suite *SandboxTestSuite) TestComponentForInvalidEntity() {
 	suite.assertDeletedComponent(suite.positionLinker, 10*numEntities, componentNotLinkedMsg, positionComponent, 10*numEntities)
 }
 
-func (suite *SandboxTestSuite) TestHeavyLinkingComponents() {
+func (suite *SandboxTestSuite) TestSandbox_HeavyLinkingComponents() {
 	for index := range numEntities {
 		LinkEntity(suite.sandbox)
 		suite.positionLinker.Link(entity.Id(index)).X = float64(index)
@@ -224,7 +224,7 @@ func (suite *SandboxTestSuite) TestHeavyLinkingComponents() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestSimpleUnlinkingComponents() {
+func (suite *SandboxTestSuite) TestSandbox_SimpleUnlinkingComponents() {
 	removedEntityId := entity.Id(rand.IntN(numEntities))
 	removedComponentEntityId := entity.Id(rand.IntN(numEntities))
 
@@ -253,7 +253,7 @@ func (suite *SandboxTestSuite) TestSimpleUnlinkingComponents() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestHeavyUnlinkingComponents() {
+func (suite *SandboxTestSuite) TestSandbox_HeavyUnlinkingComponents() {
 	for index := range numEntities {
 		LinkEntity(suite.sandbox)
 		suite.positionLinker.Link(entity.Id(index))
@@ -313,7 +313,7 @@ func (suite *SandboxTestSuite) TestHeavyUnlinkingComponents() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestHeavyTags() {
+func (suite *SandboxTestSuite) TestSandbox_HeavyTags() {
 	tagA := "A"
 	tagB := "B"
 	tagC := "C"
@@ -382,7 +382,7 @@ func (suite *SandboxTestSuite) TestHeavyTags() {
 	}
 }
 
-func (suite *SandboxTestSuite) TestSimplePooling() {
+func (suite *SandboxTestSuite) TestSandbox_SimplePooling() {
 	for index := range numEntities {
 		LinkEntity(suite.sandbox)
 		suite.positionLinker.Link(entity.Id(index))
@@ -408,10 +408,9 @@ func (suite *SandboxTestSuite) TestSimplePooling() {
 	for i := poolSize; i < numEntities; i++ {
 		assert.Equal(suite.T(), float64(0), suite.positionLinker.Get(entity.Id(i)).X, componentValueMsg, positionComponent, i)
 	}
-
 }
 
-func (suite *SandboxTestSuite) TestSimpleFilter() {
+func (suite *SandboxTestSuite) TestSandbox_SimpleFilter() {
 	positionFilter := Filter(suite.sandbox, filter.Match[position]())
 	duplicateFilter := Filter(suite.sandbox, filter.Match[position]())
 	assert.Equal(suite.T(), positionFilter, duplicateFilter)
@@ -427,7 +426,7 @@ func (suite *SandboxTestSuite) TestSimpleFilter() {
 	assert.Len(suite.T(), positionFilter.EntityIds(), numEntities, filterIncorrectNumEntitiesMsg)
 }
 
-func (suite *SandboxTestSuite) TestHeavyFilter() {
+func (suite *SandboxTestSuite) TestSandbox_HeavyFilter() {
 	armorHandler := TagLinker(suite.sandbox, armorComponent)
 	filter1 := Filter(suite.sandbox, filter.Match2[position, velocity](), filter.ExcludeTags(armorComponent))
 	filter2 := Filter(suite.sandbox, filter.Match2[position, velocity](), filter.MatchTags(armorComponent))

@@ -45,14 +45,16 @@ func (l *linkManager) Get(componentId component.Id) api.ComponentLinker {
 }
 
 // UpdateLinks method - updates the links between components and entities (removes component instances for entities)
-func (l *linkManager) UpdateLinks(scheduledEntityRemoves *bitset.BitSet) {
+func (l *linkManager) UpdateLinks(scheduledSandboxRemoves *bitset.BitSet) {
 
 	for index := range l.componentIdCursor {
-		// retrieve the component linker for the given index
+		// Retrieve the component linker for the given index
 		resolver := l.componentLinkers.Get(index)
-		// remove the component instances for the entities that are scheduled for removal
-		resolver.Update(scheduledEntityRemoves)
-		// refresh the component linker (clear scheduled removals)
+		// Clean corresponding scheduled entity removal bits from the linked entities bitset
+		resolver.CleanScheduledEntities(scheduledSandboxRemoves)
+		// Clean corresponding scheduled entity removal instances from the component table
+		resolver.CleanScheduledInstances()
+		// Refresh the component linker (clear scheduled removals buffer)
 		resolver.Refresh()
 	}
 	// clear link manager flag (all linker have been updated)

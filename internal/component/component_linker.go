@@ -4,7 +4,6 @@ import (
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/andrei-cosmin/sandecs/internal/api"
-	"github.com/bits-and-blooms/bitset"
 )
 
 // componentLinker struct - manages component instances of type T
@@ -65,13 +64,7 @@ func (r *componentLinker[T]) Link(entityId entity.Id) *T {
 	return nil
 }
 
-// Update method - updates the component instances for the entities that are scheduled for removal
-//
-// NOTE: the method will overwrite the update method from the internal linker
-func (r *componentLinker[T]) Update(scheduledEntityRemoves *bitset.BitSet) {
-	// Remove the component instances for the entities that are scheduled for removal
-	r.linker.Update(scheduledEntityRemoves)
-
-	// Clear the scheduled removals
+// CleanScheduledInstances method - clears the instances corresponding to the scheduled entity removals
+func (r *componentLinker[T]) CleanScheduledInstances() {
 	r.components.clear(r.scheduledRemoves)
 }

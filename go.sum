@@ -2,6 +2,8 @@ github.com/andrei-cosmin/sandata v1.0.0 h1:zj2PLZE2uosk8h7hfW581FlENnxgimQyXOzmF
 github.com/andrei-cosmin/sandata v1.0.0/go.mod h1:FxOfv9A3/LnjJnZVDye1Cd5yLk+S/1b1flr7ob/5LC4=
 github.com/andrei-cosmin/sandata v1.0.1 h1:ooASp46c8zLhD9bH/Z45C4Tvx595Vfhm8z7EDu2Szy0=
 github.com/andrei-cosmin/sandata v1.0.1/go.mod h1:KBxP/E6aiTiAkaAEFZNJ+mOuKzjAgr6Ovu6ZXdHOIVU=
+github.com/andrei-cosmin/sandata v1.0.2/go.mod h1:KBxP/E6aiTiAkaAEFZNJ+mOuKzjAgr6Ovu6ZXdHOIVU=
+github.com/andrei-cosmin/sandata v1.0.3/go.mod h1:KBxP/E6aiTiAkaAEFZNJ+mOuKzjAgr6Ovu6ZXdHOIVU=
 github.com/bits-and-blooms/bitset v1.13.0 h1:bAQ9OPNFYbGHV6Nez0tmNI0RiEu7/hxlYJRUA0wFAVE=
 github.com/bits-and-blooms/bitset v1.13.0/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

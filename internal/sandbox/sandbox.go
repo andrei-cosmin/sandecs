@@ -72,7 +72,7 @@ func (s *Sandbox) Accept(registration api.Registration) {
 }
 
 // LinkFilter method - links a filter with the sandbox
-func LinkFilter(s *Sandbox, rules []Rule) entity.View {
+func LinkFilter(s *Sandbox, rules []Rule) entity.SliceView {
 
 	// Create the rule sets buffers
 	ruleSets := make([][]component.Id, SetSize)

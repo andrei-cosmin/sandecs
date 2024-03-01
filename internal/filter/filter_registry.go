@@ -38,7 +38,7 @@ func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManag
 }
 
 // Register method - registers a filter with the given filter rules and returns a view of the filter
-func (r *Registry) Register(filterRules api.FilterRules) entity.View {
+func (r *Registry) Register(filterRules api.FilterRules) entity.SliceView {
 	// Get the hash for the filter rules (component ids are sorted before, so that 2 filters with the same component ids have the same hash)
 	hash := hashFilter(filterRules)
 
@@ -109,7 +109,7 @@ func hashFilter(rules api.FilterRules) string {
 
 // hashFilterComponentIds method - hashes the component ids and appends them to the string builder
 //
-// Filters should be registered at the beginning of the application's lifetime in the initialization phase
+// # Filters should be registered at the beginning of the application's lifetime in the initialization phase
 //
 // NOTE: this method will create a unique hash for each filter, but not necessarily an optimized string
 func hashFilterComponentIds(stringBuilder *strings.Builder, ids []component.Id) {
