@@ -1,9 +1,8 @@
 module github.com/andrei-cosmin/sandecs
 
 require (
-	github.com/andrei-cosmin/sandata v1.0.0
+	github.com/andrei-cosmin/sandata v1.0.4
 	github.com/bits-and-blooms/bitset v1.13.0
-	github.com/mlange-42/arche v0.11.0
 )
 
 require (

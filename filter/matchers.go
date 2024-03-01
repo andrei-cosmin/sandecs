@@ -5,32 +5,42 @@ import (
 	"github.com/andrei-cosmin/sandecs/internal/sandbox"
 )
 
+// Filter struct - collection of rules that can be used to filter entities.
+//   - Rules []sandbox.Rule - a collection of rules
 type Filter struct {
 	Rules []sandbox.Rule
 }
 
+// createTagRules method - creates a filter with rules for a specific tag types
 func createTagRules(ruleType sandbox.Type, tags ...component.Tag) Filter {
+	// Create a rule for each tag
 	rules := make([]sandbox.Rule, len(tags))
 	for index, tag := range tags {
+		// Create a new tag rule with the tag and rule type (match, exclude, union)
 		rules[index] = sandbox.NewTagRule(tag, ruleType)
 	}
+	// Return the filter with the rules
 	return Filter{
 		Rules: rules,
 	}
 }
 
+// MatchTags creates a filter that matches entities with the specified tags
 func MatchTags(tags ...component.Tag) Filter {
 	return createTagRules(sandbox.Match, tags...)
 }
 
+// ExcludeTags creates a filter that excludes entities with the specified tags
 func ExcludeTags(tags ...component.Tag) Filter {
 	return createTagRules(sandbox.Exclude, tags...)
 }
 
+// UnionTags creates a filter that includes entities with one of the specified tags
 func UnionTags(tags ...component.Tag) Filter {
 	return createTagRules(sandbox.Union, tags...)
 }
 
+// Match creates a filter that matches entities with the specified component
 func Match[T component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -39,6 +49,7 @@ func Match[T component.Component]() Filter {
 	}
 }
 
+// Match2 creates a filter that matches entities with the specified components
 func Match2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -48,6 +59,7 @@ func Match2[A, B component.Component]() Filter {
 	}
 }
 
+// Match3 creates a filter that matches entities with the specified components
 func Match3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -58,6 +70,7 @@ func Match3[A, B, C component.Component]() Filter {
 	}
 }
 
+// Match4 creates a filter that matches entities with the specified components
 func Match4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -69,6 +82,7 @@ func Match4[A, B, C, D component.Component]() Filter {
 	}
 }
 
+// Match5 creates a filter that matches entities with the specified components
 func Match5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -81,6 +95,7 @@ func Match5[A, B, C, D, E component.Component]() Filter {
 	}
 }
 
+// Exclude creates a filter that excludes entities with the specified component
 func Exclude[T component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -89,6 +104,7 @@ func Exclude[T component.Component]() Filter {
 	}
 }
 
+// Exclude2 creates a filter that excludes entities with the specified components
 func Exclude2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -98,6 +114,7 @@ func Exclude2[A, B component.Component]() Filter {
 	}
 }
 
+// Exclude3 creates a filter that excludes entities with the specified components
 func Exclude3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -108,6 +125,7 @@ func Exclude3[A, B, C component.Component]() Filter {
 	}
 }
 
+// Exclude4 creates a filter that excludes entities with the specified components
 func Exclude4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -119,6 +137,7 @@ func Exclude4[A, B, C, D component.Component]() Filter {
 	}
 }
 
+// Exclude5 creates a filter that excludes entities with the specified components
 func Exclude5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -131,6 +150,7 @@ func Exclude5[A, B, C, D, E component.Component]() Filter {
 	}
 }
 
+// Union creates a filter that includes entities with one the specified components
 func Union[A component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -139,6 +159,7 @@ func Union[A component.Component]() Filter {
 	}
 }
 
+// Union2 creates a filter that includes entities with one the specified components
 func Union2[A, B component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -148,6 +169,7 @@ func Union2[A, B component.Component]() Filter {
 	}
 }
 
+// Union3 creates a filter that includes entities with one the specified components
 func Union3[A, B, C component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -158,6 +180,7 @@ func Union3[A, B, C component.Component]() Filter {
 	}
 }
 
+// Union4 creates a filter that includes entities with one the specified components
 func Union4[A, B, C, D component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
@@ -169,6 +192,7 @@ func Union4[A, B, C, D component.Component]() Filter {
 	}
 }
 
+// Union5 creates a filter that includes entities with one the specified components
 func Union5[A, B, C, D, E component.Component]() Filter {
 	return Filter{
 		Rules: []sandbox.Rule{
