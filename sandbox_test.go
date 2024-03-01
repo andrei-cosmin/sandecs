@@ -424,6 +424,10 @@ func (suite *SandboxTestSuite) TestSandbox_SimpleFilter() {
 	assert.Len(suite.T(), positionFilter.EntityIds(), 0, filterIncorrectNumEntitiesMsg)
 	Update(suite.sandbox)
 	assert.Len(suite.T(), positionFilter.EntityIds(), numEntities, filterIncorrectNumEntitiesMsg)
+	
+	for _, entityId := range positionFilter.EntityIds() {
+		assert.True(suite.T(), positionFilter.EntityMask().Test(entityId))
+	}
 }
 
 func (suite *SandboxTestSuite) TestSandbox_HeavyFilter() {

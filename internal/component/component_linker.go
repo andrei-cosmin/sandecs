@@ -20,7 +20,7 @@ type componentLinker[T component.Component] struct {
 func newComponentLinker[T component.Component](
 	size, poolCapacity uint,
 	componentId component.Id, componentType string,
-	entityLinker api.EntityContainer,
+	entityLinker entity.MaskView,
 	callback func(),
 ) api.ComponentLinker {
 

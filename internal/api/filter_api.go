@@ -17,6 +17,6 @@ type FilterRules interface {
 
 // FilterRegistry interface - used for registering filter rules and updating the caches storing the filtered entities
 type FilterRegistry interface {
-	Register(filter FilterRules) entity.SliceView
+	Register(filter FilterRules) entity.View
 	UpdateLinks()
 }

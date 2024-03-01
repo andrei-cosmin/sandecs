@@ -17,7 +17,7 @@ import (
 //   - entitiesBuffer *bitset.Bitset - a bitset buffer (used for recomputing filtered entities)
 //   - defaultCacheSize uint - the default size for the caches (bitset sizes)
 type Registry struct {
-	entityLinker         api.EntityContainer
+	entityLinker         entity.MaskView
 	componentLinkManager api.ComponentLinkRetriever
 	hashes               map[string]int
 	caches               []*Cache
@@ -26,7 +26,7 @@ type Registry struct {
 }
 
 // NewRegistry method - creates a new registry with the given size, entity linker and component link manager
-func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManager api.ComponentLinkManager) *Registry {
+func NewRegistry(size uint, entityLinker entity.MaskView, componentLinkManager api.ComponentLinkManager) *Registry {
 	return &Registry{
 		entityLinker:         entityLinker,
 		componentLinkManager: componentLinkManager,
@@ -38,7 +38,7 @@ func NewRegistry(size uint, entityLinker api.EntityContainer, componentLinkManag
 }
 
 // Register method - registers a filter with the given filter rules and returns a view of the filter
-func (r *Registry) Register(filterRules api.FilterRules) entity.SliceView {
+func (r *Registry) Register(filterRules api.FilterRules) entity.View {
 	// Get the hash for the filter rules (component ids are sorted before, so that 2 filters with the same component ids have the same hash)
 	hash := hashFilter(filterRules)
 
@@ -68,25 +68,25 @@ func (r *Registry) UpdateLinks() {
 			r.entitiesBuffer.ClearAll()
 		} else {
 			// In case of required or excluded component ids, copy the linked entities from the entity linker into the buffer
-			r.entityLinker.EntityIds().CopyFull(r.entitiesBuffer)
+			r.entityLinker.EntityMask().CopyFull(r.entitiesBuffer)
 		}
 
 		// Perform logical ANDs for all required component ids
 		for _, requiredId := range cache.requiredComponentIds {
 			var componentResolver = r.componentLinkManager.Get(requiredId)
-			r.entitiesBuffer.InPlaceIntersection(componentResolver.EntityIds())
+			componentResolver.EntityMask().Intersection(r.entitiesBuffer)
 		}
 
 		// Perform logical XORs for all excluded component ids
 		for _, excludedId := range cache.excludedComponentIds {
 			var componentResolver = r.componentLinkManager.Get(excludedId)
-			r.entitiesBuffer.InPlaceDifference(componentResolver.EntityIds())
+			componentResolver.EntityMask().Difference(r.entitiesBuffer)
 		}
 
 		// Perform logical ORs for all union component ids
 		for _, unionId := range cache.unionComponentIds {
 			var componentResolver = r.componentLinkManager.Get(unionId)
-			r.entitiesBuffer.InPlaceUnion(componentResolver.EntityIds())
+			componentResolver.EntityMask().Union(r.entitiesBuffer)
 		}
 
 		// Check for new changes in the linked entities, and update the cache

@@ -55,7 +55,7 @@ func (s *Sandbox) UnlinkEntity(entityId entity.Id) {
 
 // IsEntityLinked method - checks if the entity id is linked with the sandbox
 func (s *Sandbox) IsEntityLinked(entityId entity.Id) bool {
-	return s.entityLinker.EntityIds().Test(entityId)
+	return s.entityLinker.EntityMask().Test(entityId)
 }
 
 // Update method - updates the sandbox (updates the entity linker, component link manager and filter registry)
@@ -72,7 +72,7 @@ func (s *Sandbox) Accept(registration api.Registration) {
 }
 
 // LinkFilter method - links a filter with the sandbox
-func LinkFilter(s *Sandbox, rules []Rule) entity.SliceView {
+func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 
 	// Create the rule sets buffers
 	ruleSets := make([][]component.Id, SetSize)

@@ -1,11 +1,13 @@
 package entity
 
-// SliceView interface - used for providing access to entity ids
-type SliceView interface {
+import "github.com/andrei-cosmin/sandata/data"
+
+// View interface - used for providing access to entity ids
+type View interface {
 	EntityIds() []Id
+	EntityMask() data.Mask
 }
 
-// SetView interface - used for providing access to entity ids
-type SetView interface {
-	EntityIds() []Id
+type MaskView interface {
+	EntityMask() data.Mask
 }

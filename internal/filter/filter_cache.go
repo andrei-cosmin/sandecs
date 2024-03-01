@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandata/flag"
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
@@ -28,7 +29,7 @@ type Cache struct {
 	unionComponentIds    []component.Id
 	linkMaskBuffer       *bitset.BitSet
 	unlinkMaskBuffer     *bitset.BitSet
-	filteredEntities     *bitset.BitSet
+	filteredEntities     *data.BitMask
 	entityIdsCache       []entity.Id
 	flag.Flag
 }
@@ -41,7 +42,7 @@ func newCache(size uint, filterRules api.FilterRules) *Cache {
 		unionComponentIds:    filterRules.UnionComponentIds(),
 		linkMaskBuffer:       bitset.New(size),
 		unlinkMaskBuffer:     bitset.New(size),
-		filteredEntities:     bitset.New(size),
+		filteredEntities:     data.NewMask(bitset.New(size)),
 		Flag:                 flag.New(),
 	}
 }
@@ -65,10 +66,14 @@ func (c *Cache) EntityIds() []entity.Id {
 	return c.entityIdsCache
 }
 
+func (c *Cache) EntityMask() data.Mask {
+	return c.filteredEntities
+}
+
 // checkForNewAdditions method - checks the entities from the given bitset and adds them to the filtered entities if they are not already included
 func (c *Cache) checkForNewAdditions(entities *bitset.BitSet) {
 	// If the entities are already included in the filtered entities, return
-	if c.filteredEntities.IsSuperSet(entities) {
+	if c.filteredEntities.Bits.IsSuperSet(entities) {
 		return
 	}
 
@@ -76,7 +81,7 @@ func (c *Cache) checkForNewAdditions(entities *bitset.BitSet) {
 	c.Set()
 
 	// Add the entities to the filtered entities bitset
-	c.filteredEntities.InPlaceUnion(entities)
+	c.filteredEntities.Bits.InPlaceUnion(entities)
 }
 
 // checkForNewRemovals method -  checks the entities from the given bitset and removes them from the filtered entities if they are included
@@ -90,14 +95,14 @@ func (c *Cache) checkForNewRemovals(entities *bitset.BitSet) {
 	c.Set()
 
 	// Remove the entities from the filtered entities bitset
-	c.filteredEntities.InPlaceDifference(entities)
+	c.filteredEntities.Bits.InPlaceDifference(entities)
 }
 
 // checkForNewChanges method - updates the cache with the recomputed filtered entities
 func (c *Cache) checkForNewChanges(recomputedFilteredEntities *bitset.BitSet) {
 	// Check ff the recomputed entities contain new additions
 	recomputedFilteredEntities.CopyFull(c.linkMaskBuffer)
-	c.linkMaskBuffer.InPlaceDifference(c.filteredEntities)
+	c.linkMaskBuffer.InPlaceDifference(c.filteredEntities.Bits)
 	c.checkForNewAdditions(c.linkMaskBuffer)
 
 	// Check if the recomputed entities contain new removals

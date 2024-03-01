@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandata/flag"
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/bits-and-blooms/bitset"
@@ -11,22 +12,22 @@ import (
 //   - scheduledRemoves *bitset.Bitset - a bitset storing the entities that are scheduled for removal
 //   - Flag - a flag used to mark the linker for update
 type Linker struct {
-	linkedEntities   *bitset.BitSet
-	scheduledRemoves *bitset.BitSet
+	linkedEntities   *data.BitMask
+	scheduledRemoves *data.BitMask
 	flag.Flag
 }
 
 // NewLinker method - creates a new linker with the given size (pre-allocates the bitsets)
 func NewLinker(size uint) *Linker {
 	return &Linker{
-		linkedEntities:   bitset.New(size),
-		scheduledRemoves: bitset.New(size),
+		linkedEntities:   data.NewMask(bitset.New(size)),
+		scheduledRemoves: data.NewMask(bitset.New(size)),
 		Flag:             flag.New(),
 	}
 }
 
-// EntityIds method - retrieves the linked entities (as a bitset)
-func (l *Linker) EntityIds() *bitset.BitSet {
+// EntityMask method - retrieves the linked entities (as a bitset)
+func (l *Linker) EntityMask() data.Mask {
 	return l.linkedEntities
 }
 
@@ -39,7 +40,7 @@ func (l *Linker) Link() entity.Id {
 		entityId = l.linkedEntities.Len()
 	}
 	// Set the corresponding bit in the linked entities bitset
-	l.linkedEntities.Set(entityId)
+	l.linkedEntities.Bits.Set(entityId)
 
 	// Return the entity id
 	return entityId
@@ -53,24 +54,24 @@ func (l *Linker) Unlink(entityId entity.Id) {
 	}
 
 	// Mark the entity id as scheduled for removal
-	l.scheduledRemoves.Set(entityId)
+	l.scheduledRemoves.Bits.Set(entityId)
 
 	// Flag the linker for update
 	l.Set()
 }
 
 // GetScheduledRemoves method - retrieves the scheduled removes
-func (l *Linker) GetScheduledRemoves() *bitset.BitSet {
+func (l *Linker) GetScheduledRemoves() data.Mask {
 	return l.scheduledRemoves
 }
 
 // Update method - updates the linked entities by removing the scheduled removes
 func (l *Linker) Update() {
-	l.linkedEntities.InPlaceDifference(l.scheduledRemoves)
+	l.linkedEntities.Bits.InPlaceDifference(l.scheduledRemoves.Bits)
 }
 
 // Refresh method - clears the scheduled removes and the flag (marking the entity linker as updated
 func (l *Linker) Refresh() {
-	l.scheduledRemoves.ClearAll()
+	l.scheduledRemoves.Bits.ClearAll()
 	l.Clear()
 }

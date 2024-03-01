@@ -3,14 +3,13 @@ package component
 import (
 	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandecs/component"
-	"github.com/bits-and-blooms/bitset"
 )
 
 // table interface - used for a table of components (component instances storage)
 type table[T any] interface {
 	set(index uint)
 	get(index uint) *T
-	clear(set *bitset.BitSet)
+	clear(set data.Mask)
 }
 
 // basicTable struct - basic table of components (flat component instances storage)
@@ -37,8 +36,8 @@ func (t *basicTable[T]) get(index uint) *T {
 }
 
 // clear method - clears the component instances for the given set of indices
-func (t *basicTable[T]) clear(set *bitset.BitSet) {
-	t.content.ClearAll(set)
+func (t *basicTable[T]) clear(mask data.Mask) {
+	t.content.ClearAll(mask)
 }
 
 // pooledTable struct - pooled table of components (component instances storage with pooling)
@@ -74,13 +73,9 @@ func (p *pooledTable[T]) get(index uint) *T {
 }
 
 // clear method - clears the component instances for the given set of indices
-func (p *pooledTable[T]) clear(set *bitset.BitSet) {
-	for index, hasNext := set.NextSet(0); hasNext; index, hasNext = set.NextSet(index + 1) {
-		if index >= p.content.Size() {
-			return
-		}
-
-		p.pool.Push(p.content.Get(index))
-		p.content.Clear(index)
-	}
+func (p *pooledTable[T]) clear(mask data.Mask) {
+	// In the case of the pooled table push the instance to the pool, before clearing the table
+	p.content.ClearAllFunc(mask, func(instance *T) {
+		p.pool.Push(instance)
+	})
 }

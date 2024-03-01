@@ -1,9 +1,9 @@
 package component
 
 import (
+	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
-	"github.com/andrei-cosmin/sandecs/internal/api"
 	"github.com/bits-and-blooms/bitset"
 )
 
@@ -17,33 +17,33 @@ import (
 type linker struct {
 	componentId      component.Id
 	componentType    string
-	entityLinker     api.EntityContainer
+	entityLinker     entity.MaskView
 	callback         func()
-	scheduledRemoves *bitset.BitSet
-	linkedEntities   *bitset.BitSet
+	scheduledRemoves *data.BitMask
+	linkedEntities   *data.BitMask
 }
 
 // newTagLinker method - creates a new linker with the given parameters
-func newTagLinker(size uint, componentId component.Id, componentType string, entityLinker api.EntityContainer, callback func()) *linker {
+func newTagLinker(size uint, componentId component.Id, componentType string, entityLinker entity.MaskView, callback func()) *linker {
 	return &linker{
 		componentId:      componentId,
 		componentType:    componentType,
 		entityLinker:     entityLinker,
 		callback:         callback,
-		scheduledRemoves: bitset.New(size),
-		linkedEntities:   bitset.New(size),
+		scheduledRemoves: data.NewMask(bitset.New(size)),
+		linkedEntities:   data.NewMask(bitset.New(size)),
 	}
 }
 
 // Link method - links the entity id with the component type
 func (r *linker) Link(entityId entity.Id) bool {
 	// If the entity id is not part of the world, or it is already linked, return false (linking failed)
-	if !r.entityLinker.EntityIds().Test(entityId) || r.linkedEntities.Test(entityId) {
+	if !r.entityLinker.EntityMask().Test(entityId) || r.linkedEntities.Test(entityId) {
 		return false
 	}
 
 	// Set the corresponding bit in the linked entities bitset
-	r.linkedEntities.Set(entityId)
+	r.linkedEntities.Bits.Set(entityId)
 
 	// Flag the link manager for update
 	r.callback()
@@ -70,7 +70,7 @@ func (r *linker) Unlink(entityId entity.Id) {
 	}
 
 	// Set the corresponding bit in the scheduled removes bitset
-	r.scheduledRemoves.Set(entityId)
+	r.scheduledRemoves.Bits.Set(entityId)
 
 	// Flag the link manager for update
 	r.callback()
@@ -81,23 +81,23 @@ func (r *linker) ComponentId() component.Id {
 	return r.componentId
 }
 
-// EntityIds method - returns the linked entities as a bitset
-func (r *linker) EntityIds() *bitset.BitSet {
+// EntityMask method - returns the linked entities as a bitset
+func (r *linker) EntityMask() data.Mask {
 	return r.linkedEntities
 }
 
 // CleanScheduledEntities  method - updates the linked entities (bitsets)
-func (r *linker) CleanScheduledEntities(scheduledSandboxRemoves *bitset.BitSet) {
+func (r *linker) CleanScheduledEntities(scheduledSandboxRemoves data.Mask) {
 	// Perform logical OR (Union) between:
 	// - the scheduled entity removes of the world
 	// - the scheduled entity removes of the component
-	r.scheduledRemoves.InPlaceUnion(scheduledSandboxRemoves)
+	scheduledSandboxRemoves.Union(r.scheduledRemoves.Bits)
 
 	// Perform logical difference between:
 	// - the linked entities of the component
 	// - the total scheduled entity removes (world + component)
 	// NOTE: This will clear all the bits that are scheduled for removal
-	r.linkedEntities.InPlaceDifference(r.scheduledRemoves)
+	r.linkedEntities.Bits.InPlaceDifference(r.scheduledRemoves.Bits)
 }
 
 // CleanScheduledInstances method - clears the instances corresponding to the scheduled entity removals
@@ -109,5 +109,5 @@ func (r *linker) CleanScheduledInstances() {
 
 // Refresh method - clears the scheduled removals
 func (r *linker) Refresh() {
-	r.scheduledRemoves.ClearAll()
+	r.scheduledRemoves.Bits.ClearAll()
 }

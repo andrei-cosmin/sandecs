@@ -4,8 +4,8 @@ import (
 	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandata/flag"
 	"github.com/andrei-cosmin/sandecs/component"
+	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/andrei-cosmin/sandecs/internal/api"
-	"github.com/bits-and-blooms/bitset"
 )
 
 // linkManager struct - manager for component linkers
@@ -20,14 +20,14 @@ type linkManager struct {
 	poolCapacity      uint
 	defaultLinkerSize uint
 	linkedComponents  map[string]component.Id
-	entityLinker      api.EntityContainer
+	entityLinker      entity.MaskView
 	componentLinkers  data.Array[api.ComponentLinker]
 	componentIdCursor component.Id
 	flag.Flag
 }
 
 // NewLinkManager method - creates a new link manager with the given parameters
-func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker api.EntityContainer) api.ComponentLinkManager {
+func NewLinkManager(numEntities, numComponents, poolCapacity uint, entityLinker entity.MaskView) api.ComponentLinkManager {
 	return &linkManager{
 		poolCapacity:      poolCapacity,
 		defaultLinkerSize: numEntities,
@@ -45,7 +45,7 @@ func (l *linkManager) Get(componentId component.Id) api.ComponentLinker {
 }
 
 // UpdateLinks method - updates the links between components and entities (removes component instances for entities)
-func (l *linkManager) UpdateLinks(scheduledSandboxRemoves *bitset.BitSet) {
+func (l *linkManager) UpdateLinks(scheduledSandboxRemoves data.Mask) {
 
 	for index := range l.componentIdCursor {
 		// Retrieve the component linker for the given index
