@@ -7,11 +7,11 @@ import (
 // filterRules struct - holds the rules for filtering components / tags
 //   - match []component.Id - the required component ids
 //   - exclude []component.Id - the excluded component ids
-//   - one []component.Id - the union component ids
+//   - union []component.Id - the union component ids
 type filterRules struct {
 	match   []component.Id
 	exclude []component.Id
-	one     []component.Id
+	union   []component.Id
 }
 
 // RequiredComponentIds method - returns the required component ids
@@ -26,5 +26,5 @@ func (f *filterRules) ExcludedComponentIds() []component.Id {
 
 // UnionComponentIds method - returns the union component ids
 func (f *filterRules) UnionComponentIds() []component.Id {
-	return f.one
+	return f.union
 }

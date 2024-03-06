@@ -7,6 +7,7 @@ import (
 	internalComponent "github.com/andrei-cosmin/sandecs/internal/component"
 	internalEntity "github.com/andrei-cosmin/sandecs/internal/entity"
 	internalFilter "github.com/andrei-cosmin/sandecs/internal/filter"
+	"github.com/andrei-cosmin/sandecs/options"
 	"slices"
 )
 
@@ -21,11 +22,11 @@ type Sandbox struct {
 }
 
 // New method - creates a new sandbox with pre-allocated buffers and memory for number of entities, components and pool capacity
-func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
+func New(mode options.Mode, numEntities, numComponents, poolCapacity uint) *Sandbox {
 	// Create the entity linker
 	entityLinker := internalEntity.NewLinker(numEntities)
 	// Create the component link manager
-	componentLinkManager := internalComponent.NewLinkManager(numEntities, numComponents, poolCapacity, entityLinker)
+	componentLinkManager := internalComponent.NewLinkManager(mode, numEntities, numComponents, poolCapacity, entityLinker)
 	// Create the filter registry
 	filterRegistry := internalFilter.NewRegistry(numEntities, entityLinker, componentLinkManager)
 	// Create the sandbox
@@ -95,6 +96,6 @@ func LinkFilter(s *Sandbox, rules []Rule) entity.View {
 	return s.filterRegistry.Register(&filterRules{
 		match:   ruleSets[Match],
 		exclude: ruleSets[Exclude],
-		one:     ruleSets[Union],
+		union:   ruleSets[Union],
 	})
 }

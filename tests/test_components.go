@@ -1,4 +1,4 @@
-package sandbox
+package tests
 
 const (
 	numEntities = 500000

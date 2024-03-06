@@ -1,13 +1,14 @@
 package entity
 
-import "github.com/andrei-cosmin/sandata/data"
+import "github.com/andrei-cosmin/sandata/bit"
 
 // View interface - used for providing access to entity ids
 type View interface {
 	EntityIds() []Id
-	EntityMask() data.Mask
+	EntityMask() bit.Mask
 }
 
+// MaskView interface - used for providing access to entity masks
 type MaskView interface {
-	EntityMask() data.Mask
+	EntityMask() bit.Mask
 }
