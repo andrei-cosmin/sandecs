@@ -1,113 +1,68 @@
 package component
 
 import (
-	"github.com/andrei-cosmin/sandata/data"
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
-	"github.com/bits-and-blooms/bitset"
 )
 
-// linker struct - manages the linking of entities with a specific component type
-//   - componentId component.Id - the id of the component type
-//   - componentType string - the type of the component
-//   - entityLinker api.EntityContainer - an entity container (used to retrieve which entities exist in the world at a given time)
-//   - callback func() - this callback will mark the link manager for update (will be executed when changes in  entities / instances are performed)
-//   - scheduledRemoves *bitset.Bitset - a bitset storing the entities that are scheduled for removal from the component type
-//   - linkedEntities *bitset.Bitset - a bitset storing the entities that are linked with the component type
-type linker struct {
-	componentId      component.Id
-	componentType    string
-	entityLinker     entity.MaskView
-	callback         func()
-	scheduledRemoves *data.BitMask
-	linkedEntities   *data.BitMask
+// tagLinker struct - manages the linking of entities with a specific component type
+//   - baseLinker - the base linker which holds the common linking functionality
+//   - onLink func() - a hook function which is called when a component instance is linked to an entity
+//   - onUnlink func() - a hook function which is called when a component instance is unlinked from an entity
+type tagLinker struct {
+	baseLinker
+	onLink   func()
+	onUnlink func()
 }
 
-// newTagLinker method - creates a new linker with the given parameters
-func newTagLinker(size uint, componentId component.Id, componentType string, entityLinker entity.MaskView, callback func()) *linker {
-	return &linker{
-		componentId:      componentId,
-		componentType:    componentType,
-		entityLinker:     entityLinker,
-		callback:         callback,
-		scheduledRemoves: data.NewMask(bitset.New(size)),
-		linkedEntities:   data.NewMask(bitset.New(size)),
+// newTagLinker method - creates a new tagLinker with the given parameters
+func newTagLinker(size uint, componentId component.Id, componentType string, entityLinker entity.MaskView, callback func()) *tagLinker {
+	return &tagLinker{
+		baseLinker: *newBaseLinker(size, componentId, componentType, entityLinker, callback),
 	}
 }
 
-// Link method - links the entity id with the component type
-func (r *linker) Link(entityId entity.Id) bool {
-	// If the entity id is not part of the world, or it is already linked, return false (linking failed)
-	if !r.entityLinker.EntityMask().Test(entityId) || r.linkedEntities.Test(entityId) {
-		return false
+// Link method - links an entity to the tag
+func (r *tagLinker) Link(entityId entity.Id) bool {
+	// Link the entity to the tag
+	successfullyLinked := r.baseLinker.Link(entityId)
+
+	// Call the onLink hook if the entity was successfully linked
+	if successfullyLinked && r.onLink != nil {
+		r.onLink()
 	}
 
-	// Set the corresponding bit in the linked entities bitset
-	r.linkedEntities.Bits.Set(entityId)
-
-	// Flag the link manager for update
-	r.callback()
-
-	// Return true, as the linking was successful
-	return true
+	// Return the result of the linking operation
+	return successfullyLinked
 }
 
-// Has method - checks if the entity id is linked with the component type
-func (r *linker) Has(entityId entity.Id) bool {
-	return r.linkedEntities.Test(entityId)
+// SetLinkHook method - sets a hook that will be called when an entity is linked to the tag
+func (r *tagLinker) SetLinkHook(onLink func()) {
+	r.onLink = onLink
 }
 
-// Unlink method - unlinks the entity id from the component type
-func (r *linker) Unlink(entityId entity.Id) {
-	// If the entity id is not linked with the component type, return
-	if !r.Has(entityId) {
-		return
-	}
-
-	// If the entity id is already scheduled for removal, return
-	if r.scheduledRemoves.Test(entityId) {
-		return
-	}
-
-	// Set the corresponding bit in the scheduled removes bitset
-	r.scheduledRemoves.Bits.Set(entityId)
-
-	// Flag the link manager for update
-	r.callback()
+// SetUnlinkHook method - sets a hook that will be called when an entity is unlinked from the tag
+func (r *tagLinker) SetUnlinkHook(onUnlink func()) {
+	r.onUnlink = onUnlink
 }
 
-// ComponentId method - returns the component id
-func (r *linker) ComponentId() component.Id {
-	return r.componentId
+// RemoveLinkHook method - removes the link hook
+func (r *tagLinker) RemoveLinkHook(onLink func()) {
+	r.onLink = nil
 }
 
-// EntityMask method - returns the linked entities as a bitset
-func (r *linker) EntityMask() data.Mask {
-	return r.linkedEntities
-}
-
-// CleanScheduledEntities  method - updates the linked entities (bitsets)
-func (r *linker) CleanScheduledEntities(scheduledSandboxRemoves data.Mask) {
-	// Perform logical OR (Union) between:
-	// - the scheduled entity removes of the world
-	// - the scheduled entity removes of the component
-	scheduledSandboxRemoves.Union(r.scheduledRemoves.Bits)
-
-	// Perform logical difference between:
-	// - the linked entities of the component
-	// - the total scheduled entity removes (world + component)
-	// NOTE: This will clear all the bits that are scheduled for removal
-	r.linkedEntities.Bits.InPlaceDifference(r.scheduledRemoves.Bits)
+// RemoveUnlinkHook method - removes the unlink hook
+func (r *tagLinker) RemoveUnlinkHook(onUnlink func()) {
+	r.onUnlink = nil
 }
 
 // CleanScheduledInstances method - clears the instances corresponding to the scheduled entity removals
 //
-// NOTE: In the case of the tag linker, it will only call the listener OnRemove hook
-func (r *linker) CleanScheduledInstances() {
-	// No-op
-}
-
-// Refresh method - clears the scheduled removals
-func (r *linker) Refresh() {
-	r.scheduledRemoves.Bits.ClearAll()
+// NOTE: In the case of the tagLinker, it will only call the listener OnRemove hook
+func (r *tagLinker) CleanScheduledInstances() {
+	if r.onUnlink != nil {
+		for range r.scheduledRemoves.Bits.Count() {
+			r.onUnlink()
+		}
+	}
 }

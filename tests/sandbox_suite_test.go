@@ -1,6 +1,7 @@
-package sandbox
+package tests
 
 import (
+	sandbox "github.com/andrei-cosmin/sandecs"
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/stretchr/testify/assert"
@@ -10,15 +11,15 @@ import (
 
 type sandboxSuite struct {
 	suite.Suite
-	sandbox *Sandbox
+	sandbox *sandbox.Sandbox
 }
 
 func (suite *sandboxSuite) assertEntity(entityId entity.Id, message ...interface{}) {
-	assert.True(suite.T(), IsEntityLinked(suite.sandbox, entityId), message...)
+	assert.True(suite.T(), sandbox.IsEntityLinked(suite.sandbox, entityId), message...)
 }
 
 func (suite *sandboxSuite) assertDeletedEntity(entityId entity.Id, message ...interface{}) {
-	assert.True(suite.T(), !IsEntityLinked(suite.sandbox, entityId), message...)
+	assert.True(suite.T(), !sandbox.IsEntityLinked(suite.sandbox, entityId), message...)
 }
 
 func (suite *sandboxSuite) assertComponent(linker component.BasicLinker, entityId entity.Id, message ...interface{}) {

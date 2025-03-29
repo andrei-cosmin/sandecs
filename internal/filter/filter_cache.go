@@ -1,7 +1,7 @@
 package filter
 
 import (
-	"github.com/andrei-cosmin/sandata/data"
+	"github.com/andrei-cosmin/sandata/bit"
 	"github.com/andrei-cosmin/sandata/flag"
 	"github.com/andrei-cosmin/sandecs/component"
 	"github.com/andrei-cosmin/sandecs/entity"
@@ -13,13 +13,13 @@ import (
 type CacheId = uint
 
 // Cache struct - filter cache stores the context for a filter (component types , rules, linked entities)
-//   - cacheId int - the id of the filter
+//   - cacheId CacheId - the id of the filter
 //   - requiredComponentIds []component.Id - the required component ids
 //   - excludedComponentIds []component.Id - the excluded component ids
 //   - unionComponentIds []component.Id - the union component ids
 //   - linkMaskBuffer *bitset.Bitset - a bitset buffer
 //   - unlinkMaskBuffer *bitset.Bitset - a bitset buffer
-//   - filteredEntities *bitset.bitset - a bitset storing the entities corresponding to the filter
+//   - filteredEntities *data.BitMask - a bitset storing the entities corresponding to the filter
 //   - entityIdsCache []entity.Id -  a cache for the expanded entity ids (pre-allocated buffer for storing the entity ids)
 //   - Flag: a flag used to mark that the cache is dirty and the expanded entity ids need to be refreshed
 type Cache struct {
@@ -29,7 +29,7 @@ type Cache struct {
 	unionComponentIds    []component.Id
 	linkMaskBuffer       *bitset.BitSet
 	unlinkMaskBuffer     *bitset.BitSet
-	filteredEntities     *data.BitMask
+	filteredEntities     *bit.BitMask
 	entityIdsCache       []entity.Id
 	flag.Flag
 }
@@ -42,7 +42,7 @@ func newCache(size uint, filterRules api.FilterRules) *Cache {
 		unionComponentIds:    filterRules.UnionComponentIds(),
 		linkMaskBuffer:       bitset.New(size),
 		unlinkMaskBuffer:     bitset.New(size),
-		filteredEntities:     data.NewMask(bitset.New(size)),
+		filteredEntities:     bit.NewMask(bitset.New(size)),
 		Flag:                 flag.New(),
 	}
 }
@@ -66,7 +66,8 @@ func (c *Cache) EntityIds() []entity.Id {
 	return c.entityIdsCache
 }
 
-func (c *Cache) EntityMask() data.Mask {
+// EntityMask method - returns the filtered entities as a bitset
+func (c *Cache) EntityMask() bit.Mask {
 	return c.filteredEntities
 }
 
@@ -100,7 +101,7 @@ func (c *Cache) checkForNewRemovals(entities *bitset.BitSet) {
 
 // checkForNewChanges method - updates the cache with the recomputed filtered entities
 func (c *Cache) checkForNewChanges(recomputedFilteredEntities *bitset.BitSet) {
-	// Check ff the recomputed entities contain new additions
+	// Check if the recomputed entities contain new additions
 	recomputedFilteredEntities.CopyFull(c.linkMaskBuffer)
 	c.linkMaskBuffer.InPlaceDifference(c.filteredEntities.Bits)
 	c.checkForNewAdditions(c.linkMaskBuffer)

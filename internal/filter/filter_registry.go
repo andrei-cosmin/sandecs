@@ -10,7 +10,7 @@ import (
 )
 
 // Registry struct - holds the filter registry
-//   - entityLinker api.EntityContainer - the entity linker
+//   - entityLinker entity.MaskView - the entity linker
 //   - componentLinkManager api.ComponentLinkRetriever - the component link manager
 //   - hashes map[string]int - a map of hashes for the filter rules (used to check if a filter is already registered)
 //   - caches []*Cache - a slice of caches for the filters
@@ -49,6 +49,7 @@ func (r *Registry) Register(filterRules api.FilterRules) entity.View {
 
 	// Create a new cache for the filter rules and add it to the registry
 	filterCache := newCache(r.defaultCacheSize, filterRules)
+
 	// Add the hash to the map, with the index of the new cache
 	r.hashes[hash] = len(r.caches)
 	r.caches = append(r.caches, filterCache)
@@ -62,7 +63,7 @@ func (r *Registry) UpdateLinks() {
 	// Iterate through the caches and update the linked entities
 	for _, cache := range r.caches {
 		// If no component ids are required or excluded, clear the linked entities buffer
-		// If only unions are present, only logical ORs will be performed (in which case the masks present in the cache sufficient)
+		// If only unions are present, only logical ORs will be performed (in which case the masks present in the cache are sufficient)
 		// Performing logical ORs with the empty buffer will not change the result, while having the sandbox entities will give incorrect results
 		if len(cache.requiredComponentIds) == 0 && len(cache.excludedComponentIds) == 0 {
 			r.entitiesBuffer.ClearAll()

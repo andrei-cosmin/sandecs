@@ -5,11 +5,8 @@ import (
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/andrei-cosmin/sandecs/filter"
 	"github.com/andrei-cosmin/sandecs/internal/sandbox"
+	"github.com/andrei-cosmin/sandecs/options"
 )
-
-const DefaultNumEntities = 128
-const DefaultNumComponents = 16
-const DefaultPoolCapacity = 1024
 
 // Sandbox struct - the context in which the entities and components are linked
 type Sandbox struct {
@@ -22,15 +19,15 @@ type Sandbox struct {
 //   - poolCapacity uint - the capacity of the component pools (component instances will be stored in memory and reused instead of being garbage collected)
 //
 // NOTE: pool capacity set to 0 will deactivate pooling altogether (basic array tables will be used to store component instances)
-func New(numEntities, numComponents, poolCapacity uint) *Sandbox {
+func New(mode options.Mode, numEntities, numComponents, poolCapacity uint) *Sandbox {
 	return &Sandbox{
-		internal: sandbox.New(numEntities, numComponents, poolCapacity),
+		internal: sandbox.New(mode, numEntities, numComponents, poolCapacity),
 	}
 }
 
 // NewDefault method - creates a new sandbox with default values for numEntities, numComponents and poolCapacity
 func NewDefault() *Sandbox {
-	return New(DefaultNumEntities, DefaultNumComponents, DefaultPoolCapacity)
+	return New(options.Standard, options.DefaultNumEntities, options.DefaultNumComponents, options.DefaultPoolCapacity)
 }
 
 // Filter method - creates a view of the entities that pass the given filters

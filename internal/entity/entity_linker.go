@@ -1,37 +1,32 @@
 package entity
 
 import (
-	"github.com/andrei-cosmin/sandata/data"
+	"github.com/andrei-cosmin/sandata/bit"
 	"github.com/andrei-cosmin/sandata/flag"
 	"github.com/andrei-cosmin/sandecs/entity"
 	"github.com/bits-and-blooms/bitset"
 )
 
 // Linker struct - entity linker (links entities to the sandbox)
-//   - linkedEntities *bitset.Bitset - a bitset storing the linked entities
-//   - scheduledRemoves *bitset.Bitset - a bitset storing the entities that are scheduled for removal
+//   - linkedEntities *data.BitMask - a bitset storing the linked entities
+//   - scheduledRemoves *data.BitMask - a bitset storing the entities that are scheduled for removal
 //   - Flag - a flag used to mark the linker for update
 type Linker struct {
-	linkedEntities   *data.BitMask
-	scheduledRemoves *data.BitMask
+	linkedEntities   *bit.BitMask
+	scheduledRemoves *bit.BitMask
 	flag.Flag
 }
 
 // NewLinker method - creates a new linker with the given size (pre-allocates the bitsets)
 func NewLinker(size uint) *Linker {
 	return &Linker{
-		linkedEntities:   data.NewMask(bitset.New(size)),
-		scheduledRemoves: data.NewMask(bitset.New(size)),
+		linkedEntities:   bit.NewMask(bitset.New(size)),
+		scheduledRemoves: bit.NewMask(bitset.New(size)),
 		Flag:             flag.New(),
 	}
 }
 
-// EntityMask method - retrieves the linked entities (as a bitset)
-func (l *Linker) EntityMask() data.Mask {
-	return l.linkedEntities
-}
-
-// Link method - links the entity id with the sandbox
+// Link method - links a new entity with the sandbox, returning the entity id
 func (l *Linker) Link() entity.Id {
 	// Find the first clear bit in the linked entities bitset
 	entityId, exists := l.linkedEntities.NextClear(0)
@@ -60,8 +55,13 @@ func (l *Linker) Unlink(entityId entity.Id) {
 	l.Set()
 }
 
+// EntityMask method - retrieves the linked entities (as a bitset)
+func (l *Linker) EntityMask() bit.Mask {
+	return l.linkedEntities
+}
+
 // GetScheduledRemoves method - retrieves the scheduled removes
-func (l *Linker) GetScheduledRemoves() data.Mask {
+func (l *Linker) GetScheduledRemoves() bit.Mask {
 	return l.scheduledRemoves
 }
 
